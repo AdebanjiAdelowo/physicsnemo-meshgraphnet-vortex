@@ -1,0 +1,17 @@
+# PhysicsNeMo is pinned to the commit of its main branch that this repository was
+# adapted from and tested with (version 2.3.0a0).
+nvidia-physicsnemo @ git+https://github.com/NVIDIA/physicsnemo.git@b45a5c810c741e6b41f8515be24c51121f8fc21f
+# Graph dependencies of MeshGraphNet. PhysicsNeMo at this commit needs torch>=2.13, and
+# the PyG wheel index (data.pyg.org) has no torch_scatter wheels for torch 2.13 or 2.14,
+# so torch_scatter is built against the installed PyTorch before this file is installed:
+#   pip install setuptools wheel
+#   FORCE_ONLY_CPU=1 pip install torch_scatter --no-build-isolation
+# The CPU-only build is sufficient on CUDA and MPS: MeshGraphNet uses the sum
+# aggregation of torch_scatter.scatter, which is implemented with torch.scatter_add_.
+torch_geometric>=2.6.1
+torch_scatter>=2.1.2
+tfrecord>=1.14.0
+hydra-core>=1.3.2
+matplotlib>=3.8
+scipy>=1.15.0
+pytest>=8.0

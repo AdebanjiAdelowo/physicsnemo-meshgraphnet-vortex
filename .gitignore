@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+.venv/
+*.egg-info/
+
+# datasets, run directories, checkpoints, rollouts and archives (tracked summaries live in results/)
+data/
+runs/
+outputs/
+checkpoints/
+*.tfrecord
+*.pt
+*.mdlus
+*.zip
+*.tar.gz
+kaggle/output/
