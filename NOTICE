@@ -1,0 +1,25 @@
+physicsnemo-meshgraphnet-vortex
+Copyright 2026 Adebanji Adelowo
+
+This repository contains material adapted from NVIDIA PhysicsNeMo
+(https://github.com/NVIDIA/physicsnemo), Copyright (c) 2023 - 2026 NVIDIA
+CORPORATION & AFFILIATES, licensed under the Apache License, Version 2.0.
+
+Adapted from examples/cfd/vortex_shedding_mgn at commit
+b45a5c810c741e6b41f8515be24c51121f8fc21f:
+
+  configs/official.yaml       from conf/config.yaml (keys and values kept, except the
+                              hydra block and data_dir; keys added below a marker)
+  src/mgn_vortex/model.py     MeshGraphNet construction from train.py
+  src/mgn_vortex/engine.py    MGNTrainer and the epoch loop from train.py
+  src/mgn_vortex/rollout.py   MGNRollout.predict from inference.py
+
+Each of these files carries the original NVIDIA copyright and licence header and
+a statement of the changes. The MeshGraphNet model, the VortexSheddingDataset
+class (graph construction, noise, normalisation) and the checkpoint utilities are
+imported from the PhysicsNeMo package and are not copied.
+
+The data are DeepMind's cylinder_flow dataset, released with "Learning Mesh-Based
+Simulation with Graph Networks" (Pfaff et al., ICLR 2021) at
+https://github.com/google-deepmind/deepmind-research/tree/master/meshgraphnets.
+No data files are distributed with this repository.

@@ -108,3 +108,15 @@ def test_resume_skips_finished_runs(cfg, tmp_path, capsys):
     train_study(cfg, tmp_path, resume=True)
     out = capsys.readouterr().out
     assert out.count("[skip]") == 2 and "[train]" not in out
+
+
+def test_only_complete_seeds_are_evaluated(cfg, tmp_path):
+    from omegaconf import OmegaConf
+
+    out_dir = train_study(cfg, tmp_path)
+    two_seeds = OmegaConf.merge(cfg, {"study": {"seeds": [0, 1]}})
+    engine.train_run(two_seeds, 2, 1, out_dir / "mp02_seed1", CPU)  # seed 1 lacks processor size 3
+    summary = evaluate_study(two_seeds, tmp_path)
+    assert summary["seeds"] == [0]
+    assert summary["missing_runs"] == ["mp02_seed1", "mp03_seed1"]
+    assert all(e["n_seeds"] == 1 for e in summary["by_processor_size"])

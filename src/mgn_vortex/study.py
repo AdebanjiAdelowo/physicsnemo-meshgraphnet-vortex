@@ -108,9 +108,12 @@ def evaluate_study(cfg: DictConfig, root: Path) -> dict:
     out_dir = output_dir(cfg, root)
     device = resolve_device(cfg.device)
     check_data(cfg)
-    runs = [(k, s) for k, s in engine.study_runs(cfg) if (out_dir / engine.run_name(k, s) / "train_metrics.json").exists()]
+    trained = {(k, s) for k, s in engine.study_runs(cfg) if (out_dir / engine.run_name(k, s) / "train_metrics.json").exists()}
+    # only seeds that are trained for every processor size are evaluated, so that all sizes are compared on the same seeds
+    seeds = [int(s) for s in cfg.study.seeds if all((int(k), int(s)) in trained for k in cfg.study.processor_sizes)]
+    runs = [(k, s) for k, s in engine.study_runs(cfg) if s in seeds]
     if not runs:
-        raise SystemExit(f"no trained runs in {out_dir}")
+        raise SystemExit(f"no seed of {out_dir} is trained for every processor size")
     missing = [engine.run_name(k, s) for k, s in engine.study_runs(cfg) if (k, s) not in runs]
 
     # the plotted trajectory is the most unsteady reference trajectory: chosen from the data, not from a model
@@ -151,6 +154,7 @@ def evaluate_study(cfg: DictConfig, root: Path) -> dict:
         "name": cfg.name,
         "steps_per_run": steps_per_run(cfg),
         "evaluation_device": str(device),
+        "seeds": seeds,
         "missing_runs": missing,
         "test_trajectories": cfg.num_test_samples,
         "reference_fluctuation_ratio": fluctuation.tolist(),

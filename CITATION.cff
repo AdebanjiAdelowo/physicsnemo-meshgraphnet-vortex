@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: >-
+  If you use this repository, please cite it, the NVIDIA PhysicsNeMo framework it is
+  built on and the MeshGraphNets paper whose dataset it uses (see the references section).
+title: "Message-passing depth study of the PhysicsNeMo MeshGraphNet vortex-shedding example"
+type: software
+authors:
+  - family-names: Adelowo
+    given-names: Adebanji
+license: Apache-2.0
+references:
+  - type: software
+    title: "NVIDIA PhysicsNeMo: An open-source framework for physics-based deep learning in science and engineering"
+    authors:
+      - name: "PhysicsNeMo Contributors"
+    url: "https://github.com/NVIDIA/physicsnemo"
+  - type: conference-paper
+    title: "Learning Mesh-Based Simulation with Graph Networks"
+    authors:
+      - family-names: Pfaff
+        given-names: Tobias
+      - family-names: Fortunato
+        given-names: Meire
+      - family-names: Sanchez-Gonzalez
+        given-names: Alvaro
+      - family-names: Battaglia
+        given-names: Peter W.
+    collection-title: "International Conference on Learning Representations"
+    year: 2021
+    url: "https://arxiv.org/abs/2010.03409"

@@ -4,7 +4,8 @@
 
 Writes ``eval_metrics.json`` and ``rollout_curves.npz`` per run and ``summary.csv``,
 ``summary.json`` and ``fields.npz`` to the study directory. Pass the same overrides that
-were used for training. Runs of the config that are not trained yet are listed as missing.
+were used for training. Only seeds trained for every processor size are evaluated; the
+other runs of the config are listed as missing.
 """
 
 import argparse
@@ -27,7 +28,7 @@ def main() -> None:
             f"{entry['rollout_mean_rel_l2_velocity_window_mean']:.3e} over {entry['n_seeds']} seed(s)"
         )
     if summary["missing_runs"]:
-        print("not trained yet:", ", ".join(summary["missing_runs"]))
+        print("not evaluated (seed incomplete or not trained):", ", ".join(summary["missing_runs"]))
 
 
 if __name__ == "__main__":
