@@ -1,0 +1,31 @@
+# Pipeline check only: two tiny models, a few dozen gradient steps. Not a result.
+defaults:
+  - official
+  - _self_
+
+name: smoke
+device: cpu
+
+epochs: 1
+num_training_samples: 2
+num_training_time_steps: 20
+num_dataloader_workers: 0
+num_test_samples: 2
+num_test_time_steps: 30
+
+log_every: 10
+
+validation:
+  num_samples: 1
+  stride: 5
+  per_epoch: 2
+
+rollout:
+  horizons: [1, 10, 19, 29]
+  max_lag: 5
+  one_step_stride: 1
+  field_times: [10, 19, 29]
+
+study:
+  processor_sizes: [2, 3]
+  seeds: [0]

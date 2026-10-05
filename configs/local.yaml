@@ -1,0 +1,31 @@
+# Fixed-budget reduced study sized for a laptop (Apple MPS or CPU).
+# Model, loss, optimiser, learning-rate schedule, batch size, noise and time window
+# as upstream. Reduced: 40 training trajectories and 1 epoch, 11,960 gradient steps
+# per model, the same for every processor size.
+defaults:
+  - official
+  - _self_
+
+name: local
+
+epochs: 1
+num_training_samples: 40
+num_training_time_steps: 300
+num_dataloader_workers: 0
+num_test_samples: 10
+num_test_time_steps: 600      # rollouts continue 300 steps past the training window
+
+log_every: 500
+
+validation:
+  num_samples: 5
+  stride: 10
+  per_epoch: 8
+
+rollout:
+  horizons: [1, 10, 50, 100, 200, 299, 450, 599]
+  field_times: [50, 150, 299, 599]
+
+study:
+  processor_sizes: [5, 10, 15]
+  seeds: [0, 1, 2]

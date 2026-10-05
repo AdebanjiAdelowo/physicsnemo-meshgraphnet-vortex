@@ -1,0 +1,33 @@
+# Fixed-budget reduced study sized for one NVIDIA GPU session (e.g. a Kaggle T4).
+# Model, loss, optimiser, learning-rate schedule, batch size, noise and time window
+# as upstream. Reduced: 200 training trajectories and 2 epochs, 119,600 gradient
+# steps per model, the same for every processor size. This is 4 % of the 2,990,000
+# sample presentations of configs/official.yaml and is not NVIDIA's reference run.
+defaults:
+  - official
+  - _self_
+
+name: full
+device: cuda
+
+epochs: 2
+num_training_samples: 200
+num_training_time_steps: 300
+num_dataloader_workers: 2
+num_test_samples: 50
+num_test_time_steps: 600      # rollouts continue 300 steps past the training window
+
+log_every: 2000
+
+validation:
+  num_samples: 10
+  stride: 10
+  per_epoch: 5
+
+rollout:
+  horizons: [1, 10, 50, 100, 200, 299, 450, 599]
+  field_times: [50, 150, 299, 599]
+
+study:
+  processor_sizes: [5, 10, 15]
+  seeds: [0, 1, 2]
