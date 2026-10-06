@@ -111,8 +111,8 @@ def _window_line(ax, study: Study, steps: int, label: bool = True) -> None:
     if steps > study.window:
         ax.axvline(study.window, color=MUTED, linewidth=1.0, linestyle=":")
         if label:
-            ax.annotate("end of training\ntime window", (study.window, 1.0), xycoords=("data", "axes fraction"),
-                        xytext=(4, -4), textcoords="offset points", va="top", fontsize=7.5, color=MUTED)
+            ax.annotate("end of training\ntime window", (study.window, 0.0), xycoords=("data", "axes fraction"),
+                        xytext=(4, 4), textcoords="offset points", va="bottom", fontsize=7.5, color=MUTED)
 
 
 def rollout_error(study: Study, out: Path) -> Path:
@@ -137,7 +137,10 @@ def rollout_error(study: Study, out: Path) -> Path:
 
 
 def error_vs_depth(study: Study, out: Path) -> Path:
-    horizons = [h for h in study.cfg["rollout"]["horizons"]]
+    horizons = list(study.cfg["rollout"]["horizons"])
+    if len(horizons) > 5:  # a readable subset: first step, short and medium range, end of the window, end of the rollout
+        keep = {horizons[0], 10, 100, study.window, horizons[-1]}
+        horizons = [h for h in horizons if h in keep]
     fig, axes = plt.subplots(1, 3, figsize=(13, 4.3), constrained_layout=True)
     x = np.array(study.sizes)
 
@@ -193,31 +196,45 @@ def training_curves(study: Study, out: Path) -> Path:
 
 
 def cost(study: Study, out: Path) -> Path:
-    fig, axes = plt.subplots(1, 3, figsize=(13, 4.3), constrained_layout=True)
+    """Parameters against error, and the cost per step from the timing probe stored with the study.
+
+    Run durations are not plotted: they include validation and depend on what else the machine
+    was doing during a long run. ``probe.json`` holds a short dedicated measurement per size.
+    """
+    probe_path = study.path / "probe.json"
+    probe = json.loads(probe_path.read_text()) if probe_path.exists() else None
+    fig, axes = plt.subplots(1, 3 if probe else 1, figsize=(13 if probe else 5, 4.3), constrained_layout=True, squeeze=False)
+    axes = axes[0]
     params = np.array([study.values(k, "parameters")[0] for k in study.sizes]) / 1e6
     x = np.array(study.sizes)
-    panels = (
-        (axes[0], params, "rollout_mean_rel_l2_velocity_window", "Parameters and rollout error", "trainable parameters (millions)", "mean velocity error over the training window", True),
-        (axes[1], x, "optimisation_seconds", "Training time", "message-passing steps", "optimisation time (s)", False),
-        (axes[2], x, "rollout_ms_per_step", "Rollout cost", "message-passing steps", "time per rollout step (ms)", False),
-    )
-    for ax, xs, key, title, xlabel, ylabel, log in panels:
-        values = np.stack([study.values(k, key) for k in study.sizes])
-        ax.plot(xs, values.mean(axis=1), color=MUTED, linewidth=1.2, zorder=1)
-        for i, size in enumerate(study.sizes):
-            color, marker, _ = study.style[size]
-            ax.plot(np.full(values.shape[1], xs[i]), values[i], linestyle="none", marker=marker, color=color, markersize=7,
-                    markeredgecolor="#fcfcfb", markeredgewidth=1.5, label=study.label(size), zorder=2)
-        ax.set_title(title)
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
-        if log:
-            ax.set_yscale("log")
-        else:
-            ax.set_ylim(bottom=0)
-            ax.set_xticks(xs)
+    errors = np.stack([study.values(k, "rollout_mean_rel_l2_velocity_window") for k in study.sizes])
+    axes[0].plot(params, errors.mean(axis=1), color=MUTED, linewidth=1.2, zorder=1)
+    for i, size in enumerate(study.sizes):
+        color, marker, _ = study.style[size]
+        axes[0].plot(np.full(errors.shape[1], params[i]), errors[i], linestyle="none", marker=marker, color=color, markersize=7,
+                     markeredgecolor="#fcfcfb", markeredgewidth=1.5, label=study.label(size), zorder=2)
+    axes[0].set_yscale("log")
+    axes[0].set_title("Parameters and rollout error (one marker per seed)")
+    axes[0].set_xlabel("trainable parameters (millions)")
+    axes[0].set_ylabel("mean velocity error over the training window")
     axes[0].legend(loc="best")
-    return _finish(fig, study, out, "Cost of depth (one marker per seed)")
+    if probe:
+        rows = {r["processor_size"]: r for r in probe["per_processor_size"]}
+        steps = study.cfg["num_test_time_steps"] - 1
+        train_ms = [1000.0 / rows[k]["steps_per_second"] for k in study.sizes]
+        rollout_ms = [1000.0 * rows[k]["rollout_seconds_per_trajectory"] / steps for k in study.sizes]
+        for ax, values, title in ((axes[1], train_ms, "Training: time per gradient step"), (axes[2], rollout_ms, "Rollout: time per step")):
+            ax.plot(x, values, color=MUTED, linewidth=1.2, zorder=1)
+            for i, size in enumerate(study.sizes):
+                color, marker, _ = study.style[size]
+                ax.plot(x[i], values[i], linestyle="none", marker=marker, color=color, markersize=8, markeredgecolor="#fcfcfb", markeredgewidth=1.5, zorder=2)
+                ax.annotate(f"{values[i]:.0f} ms", (x[i], values[i]), xytext=(0, 9), textcoords="offset points", ha="center", fontsize=8, color=MUTED)
+            ax.set_title(title)
+            ax.set_xlabel("message-passing steps")
+            ax.set_ylabel("milliseconds")
+            ax.set_xticks(x)
+            ax.set_ylim(0, 1.2 * max(values))
+    return _finish(fig, study, out, "Cost of depth")
 
 
 def error_accumulation(study: Study, out: Path) -> Path:
@@ -284,7 +301,7 @@ def fields_vorticity(study: Study, out: Path) -> Path:
     pred = mesh_ops.vorticity(fields[f"prediction_mp{size:02d}"][..., 0:2], dx, dy)
     times = fields["times"]
     limit = np.percentile(np.abs(truth), 98)
-    error_max = np.percentile(np.abs(pred - truth), 99.5)
+    error_max = np.percentile(np.abs(pred - truth), 98)
     fig, axes = plt.subplots(len(times), 3, figsize=(13, 1.05 * len(times) + 1.0), constrained_layout=True, squeeze=False)
     for i, t in enumerate(times):
         left = _panel(axes[i, 0], tri, truth[i], DIVERGING, -limit, limit)
@@ -294,8 +311,8 @@ def fields_vorticity(study: Study, out: Path) -> Path:
     axes[0, 0].set_title("Reference (COMSOL)")
     axes[0, 1].set_title(f"MeshGraphNet rollout, {size} message-passing steps")
     axes[0, 2].set_title("Absolute error")
-    fig.colorbar(left, ax=axes[:, :2], shrink=0.7, pad=0.01, label="vorticity (1/s), same scale for both columns")
-    fig.colorbar(right, ax=axes[:, 2], shrink=0.7, pad=0.02, label="|error| (1/s)")
+    fig.colorbar(left, ax=axes[:, :2], shrink=0.7, pad=0.01, label="vorticity (1/s), same scale for both columns", extend="both")
+    fig.colorbar(right, ax=axes[:, 2], shrink=0.7, pad=0.02, label="|error| (1/s), clipped at the 98th percentile", extend="max")
     title = f"Vorticity of test trajectory {int(fields['trajectory'])}, seed {int(fields['plot_seed'])}"
     return _finish(fig, study, out, title)
 
