@@ -103,8 +103,11 @@ def flatten(train: dict, ev: dict, cfg: DictConfig) -> dict:
     return row
 
 
-def evaluate_study(cfg: DictConfig, root: Path) -> dict:
-    """Evaluate every trained run from its checkpoint and write the summary files and plotting fields."""
+def evaluate_study(cfg: DictConfig, root: Path, resume: bool = False) -> dict:
+    """Evaluate every trained run from its checkpoint and write the summary files and plotting fields.
+
+    ``resume`` reuses the evaluation files of runs that were already evaluated.
+    """
     out_dir = output_dir(cfg, root)
     device = resolve_device(cfg.device)
     check_data(cfg)
@@ -124,11 +127,19 @@ def evaluate_study(cfg: DictConfig, root: Path) -> dict:
     rows, fields, persistence = [], {}, None
     for processor_size, seed in runs:
         run_dir = out_dir / engine.run_name(processor_size, seed)
-        ev, curves, run_fields = evaluation.evaluate_run(
-            cfg, processor_size, run_dir, device, field_trajectory if seed == plot_seed else None
-        )
-        write_json(run_dir / "eval_metrics.json", ev)
-        np.savez_compressed(run_dir / "rollout_curves.npz", **{k: v.astype(np.float32) for k, v in curves.items()})
+        files = [run_dir / name for name in ("eval_metrics.json", "rollout_curves.npz", "fields.npz")]
+        if resume and all(f.exists() for f in files) and int(np.load(files[2])["trajectory"]) == field_trajectory:
+            ev = json.loads(files[0].read_text())
+            curves = dict(np.load(files[1]))
+            run_fields = dict(np.load(files[2]))
+            print(f"[skip] {run_dir.name} already evaluated", flush=True)
+        else:
+            ev, curves, run_fields = evaluation.evaluate_run(cfg, processor_size, run_dir, device, field_trajectory)
+            write_json(files[0], ev)
+            np.savez_compressed(files[1], **{k: v.astype(np.float32) for k, v in curves.items()})
+            np.savez_compressed(files[2], trajectory=field_trajectory, **run_fields)
+        if seed != plot_seed:
+            run_fields = None
         train = json.loads((run_dir / "train_metrics.json").read_text())
         rows.append(flatten(train, ev, cfg))
         if persistence is None:

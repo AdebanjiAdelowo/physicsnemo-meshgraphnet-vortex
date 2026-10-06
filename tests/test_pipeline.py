@@ -108,6 +108,11 @@ def test_resume_skips_finished_runs(cfg, tmp_path, capsys):
     train_study(cfg, tmp_path, resume=True)
     out = capsys.readouterr().out
     assert out.count("[skip]") == 2 and "[train]" not in out
+    first = evaluate_study(cfg, tmp_path)
+    capsys.readouterr()
+    again = evaluate_study(cfg, tmp_path, resume=True)
+    assert capsys.readouterr().out.count("[skip]") == 2
+    assert again["runs"] == first["runs"]
 
 
 def test_only_complete_seeds_are_evaluated(cfg, tmp_path):

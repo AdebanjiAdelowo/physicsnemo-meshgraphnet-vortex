@@ -18,9 +18,10 @@ from mgn_vortex.study import evaluate_study
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--config", required=True)
+    parser.add_argument("--resume", action="store_true", help="reuse the evaluation files of runs that were already evaluated")
     parser.add_argument("overrides", nargs="*")
     args = parser.parse_args()
-    summary = evaluate_study(load_config(args.config, args.overrides), ROOT)
+    summary = evaluate_study(load_config(args.config, args.overrides), ROOT, resume=args.resume)
     for entry in summary["by_processor_size"]:
         print(
             f"processor size {entry['processor_size']:>2}: {entry['parameters']:>8} parameters, one-step velocity "

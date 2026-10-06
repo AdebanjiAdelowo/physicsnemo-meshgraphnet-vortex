@@ -26,7 +26,9 @@ KEEP_SUFFIXES = {".json", ".csv", ".npz"}
 def tracked_files(study_dir: Path) -> list[Path]:
     if not (study_dir / "summary.json").exists():
         raise SystemExit(f"{study_dir} has no summary.json; run scripts/evaluate.py first.")
-    return [p for p in sorted(study_dir.rglob("*")) if p.is_file() and p.suffix in KEEP_SUFFIXES and "checkpoints" not in p.parts]
+    files = [p for p in sorted(study_dir.rglob("*")) if p.is_file() and p.suffix in KEEP_SUFFIXES and "checkpoints" not in p.parts]
+    # the per-run plotting fields are an evaluation cache; the study-level fields.npz holds what the figures use
+    return [p for p in files if not (p.name == "fields.npz" and p.parent != study_dir)]
 
 
 def package(study_dir: Path) -> Path:

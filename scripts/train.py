@@ -24,7 +24,7 @@ def main() -> None:
     cfg = load_config(args.config, args.overrides)
     out_dir = train_study(cfg, ROOT, resume=args.resume)
     if not args.no_evaluate:
-        evaluate_study(cfg, ROOT)
+        evaluate_study(cfg, ROOT, resume=args.resume)
     print(f"Study written to {out_dir}")
 
 
