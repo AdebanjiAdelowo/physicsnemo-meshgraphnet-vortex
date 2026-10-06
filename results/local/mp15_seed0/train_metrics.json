@@ -1,0 +1,18 @@
+{
+  "run": "mp15_seed0",
+  "processor_size": 15,
+  "seed": 0,
+  "parameters": 2332419,
+  "epochs": 1,
+  "steps": 11960,
+  "training_trajectories": 40,
+  "training_time_steps": 300,
+  "final_train_loss": 0.0942498663197393,
+  "final_valid_loss": 0.04950954119364421,
+  "train_seconds": 2912.906732750009,
+  "optimisation_seconds": 2813.6865061245626,
+  "steps_per_second": 4.250651227123782,
+  "data_seconds": 3.0210348330438137,
+  "peak_train_memory_mb": null,
+  "device": "mps"
+}

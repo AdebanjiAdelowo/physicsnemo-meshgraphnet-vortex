@@ -1,0 +1,67 @@
+{
+  "config": "local",
+  "environment": {
+    "timestamp_utc": "2026-10-06T11:34:58+00:00",
+    "git_commit": "3c8f03f7f736043b8f8f8fd6b343f430ee2710fa",
+    "git_dirty": false,
+    "device": "mps",
+    "gpu_name": null,
+    "gpu_memory_gb": null,
+    "cuda_version": null,
+    "python_version": "3.12.2",
+    "torch_version": "2.13.0",
+    "physicsnemo": {
+      "version": "2.3.0a0",
+      "commit": "b45a5c810c741e6b41f8515be24c51121f8fc21f",
+      "url": "https://github.com/nvidia/physicsnemo",
+      "example": "examples/cfd/vortex_shedding_mgn"
+    },
+    "torch_geometric_version": "2.8.0.post1",
+    "torch_scatter_version": "2.1.2",
+    "tfrecord_version": "1.14.6",
+    "numpy_version": "2.5.3",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "processor": "arm",
+    "torch_threads": 5
+  },
+  "steps_per_run": 11960,
+  "runs": 9,
+  "safety_factor": 1.15,
+  "per_processor_size": [
+    {
+      "processor_size": 5,
+      "parameters": 845059,
+      "measured_steps": 300,
+      "steps_per_second": 26.545473503455174,
+      "peak_train_memory_mb": null,
+      "rollout_seconds_per_trajectory": 10.462015624972992,
+      "projected_train_hours_per_run": 0.1439249352646985,
+      "projected_eval_hours_per_run": 0.05231007812486496
+    },
+    {
+      "processor_size": 10,
+      "parameters": 1588739,
+      "measured_steps": 300,
+      "steps_per_second": 14.149338025057213,
+      "peak_train_memory_mb": null,
+      "rollout_seconds_per_trajectory": 18.514055749983527,
+      "projected_train_hours_per_run": 0.2700165582863094,
+      "projected_eval_hours_per_run": 0.09257027874991763
+    },
+    {
+      "processor_size": 15,
+      "parameters": 2332419,
+      "measured_steps": 300,
+      "steps_per_second": 9.619435877833302,
+      "peak_train_memory_mb": null,
+      "rollout_seconds_per_trajectory": 26.64443383400794,
+      "projected_train_hours_per_run": 0.3971704374431677,
+      "projected_eval_hours_per_run": 0.1332221691700397
+    }
+  ],
+  "projected_hours_per_seed": 1.0892144570389977,
+  "projected_hours_total": 3.267643371116993,
+  "budget_hours": null,
+  "fits": null,
+  "complete_seeds_within_budget": null
+}

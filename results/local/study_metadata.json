@@ -1,0 +1,137 @@
+{
+  "timestamp_utc": "2026-10-05T21:42:19+00:00",
+  "git_commit": "60e28d147c63f12ae1e8256d3ba5424f1ba460d9",
+  "git_dirty": false,
+  "device": "mps",
+  "gpu_name": null,
+  "gpu_memory_gb": null,
+  "cuda_version": null,
+  "python_version": "3.12.2",
+  "torch_version": "2.13.0",
+  "physicsnemo": {
+    "version": "2.3.0a0",
+    "commit": "b45a5c810c741e6b41f8515be24c51121f8fc21f",
+    "url": "https://github.com/nvidia/physicsnemo",
+    "example": "examples/cfd/vortex_shedding_mgn"
+  },
+  "torch_geometric_version": "2.8.0.post1",
+  "torch_scatter_version": "2.1.2",
+  "tfrecord_version": "1.14.6",
+  "numpy_version": "2.5.3",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "processor": "arm",
+  "torch_threads": 5,
+  "name": "local",
+  "steps_per_run": 11960,
+  "dataset": {
+    "name": "DeepMind MeshGraphNets cylinder_flow",
+    "source": "https://storage.googleapis.com/dm-meshgraphnets/cylinder_flow/",
+    "simulator": "comsol",
+    "dt": 0.01,
+    "trajectory_length": 600,
+    "splits": {
+      "train": {
+        "file": "train.tfrecord",
+        "trajectories_in_file": 60,
+        "trajectories_used": 40,
+        "selection": "first 40 records of the file",
+        "file_bytes": 815814924,
+        "file_sha256": "6c33f5a8073318dfdb039cedd214164249f52a210441f9be33c61e78631439f2",
+        "complete_file": false,
+        "time_steps_used": 300
+      },
+      "valid": {
+        "file": "valid.tfrecord",
+        "trajectories_in_file": 10,
+        "trajectories_used": 5,
+        "selection": "first 5 records of the file",
+        "file_bytes": 136458734,
+        "file_sha256": "afe18db043401a5ce540787a37e4eb2fbaf67f7362ccfe9f2e36dbbe5328dd60",
+        "complete_file": false,
+        "time_steps_used": 300
+      },
+      "test": {
+        "file": "test.tfrecord",
+        "trajectories_in_file": 20,
+        "trajectories_used": 10,
+        "selection": "first 10 records of the file",
+        "file_bytes": 266839264,
+        "file_sha256": "d7002fec7afe8f83c7d57e2707b4fdd1505498a500bce14017462c2baf70aae3",
+        "complete_file": false,
+        "time_steps_used": 600
+      }
+    }
+  },
+  "config": {
+    "data_dir": "data/cylinder_flow",
+    "batch_size": 1,
+    "epochs": 1,
+    "num_training_samples": 40,
+    "num_training_time_steps": 300,
+    "lr": 0.0001,
+    "lr_decay_rate": 0.9999991,
+    "num_input_features": 6,
+    "num_output_features": 3,
+    "num_edge_features": 3,
+    "amp": false,
+    "jit": false,
+    "num_dataloader_workers": 0,
+    "do_concat_trick": false,
+    "num_processor_checkpoint_segments": 0,
+    "recompute_activation": false,
+    "wandb_mode": "disabled",
+    "watch_model": false,
+    "ckpt_path": "./checkpoints",
+    "num_test_samples": 10,
+    "num_test_time_steps": 600,
+    "viz_vars": [
+      "u",
+      "v",
+      "p"
+    ],
+    "frame_skip": 10,
+    "frame_interval": 1,
+    "name": "local",
+    "output_dir": "runs/local",
+    "device": "auto",
+    "processor_size": 15,
+    "log_every": 500,
+    "validation": {
+      "num_samples": 5,
+      "stride": 10,
+      "per_epoch": 8
+    },
+    "rollout": {
+      "horizons": [
+        1,
+        10,
+        50,
+        100,
+        200,
+        299,
+        450,
+        599
+      ],
+      "max_lag": 40,
+      "one_step_stride": 5,
+      "field_times": [
+        50,
+        150,
+        299,
+        599
+      ]
+    },
+    "study": {
+      "processor_sizes": [
+        5,
+        10,
+        15
+      ],
+      "seeds": [
+        0,
+        1,
+        2
+      ]
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "run": "mp10_seed2",
+  "processor_size": 10,
+  "seed": 2,
+  "parameters": 1588739,
+  "epochs": 1,
+  "steps": 11960,
+  "training_trajectories": 40,
+  "training_time_steps": 300,
+  "final_train_loss": 0.13484622291896653,
+  "final_valid_loss": 0.06493209838867188,
+  "train_seconds": 3382.7483772920677,
+  "optimisation_seconds": 3274.3131842524745,
+  "steps_per_second": 3.6526744165831735,
+  "data_seconds": 4.230921708978713,
+  "peak_train_memory_mb": null,
+  "device": "mps"
+}

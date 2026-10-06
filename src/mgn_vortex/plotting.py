@@ -128,12 +128,14 @@ def rollout_error(study: Study, out: Path) -> Path:
             persistence = study.curves(study.sizes[0], "persistence_rel_l2_velocity")[0].mean(axis=0)
             ax.plot(x, persistence, color=MUTED, linewidth=1.2, linestyle=(0, (1, 1)), label="initial state held fixed")
         _window_line(ax, study, len(x), label=name == "rel_l2_velocity")
+        if name == "rel_l2_velocity":
+            ax.legend(handles=[ax.lines[-2]], loc="lower right")
         ax.set_yscale("log")
         ax.set_xlabel("rollout step (0.01 s each)")
         ax.set_ylabel("relative $L^2$ error")
         ax.set_title(title)
-    axes[0].legend(loc="lower right")
-    return _finish(fig, study, out, "Rollout error against time, mean over test trajectories")
+    axes[1].legend(loc="lower right")
+    return _finish(fig, study, out, "Rollout error against time, mean over test trajectories (band: range over seeds)")
 
 
 def error_vs_depth(study: Study, out: Path) -> Path:

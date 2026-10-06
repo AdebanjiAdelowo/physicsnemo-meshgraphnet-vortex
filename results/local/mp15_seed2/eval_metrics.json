@@ -1,0 +1,496 @@
+{
+  "run": "mp15_seed2",
+  "processor_size": 15,
+  "test_trajectories": 10,
+  "rollout_steps": 599,
+  "training_window_steps": 299,
+  "one_step_stride": 5,
+  "one_step": {
+    "window": {
+      "rel_l2_velocity": 0.010972532830729092,
+      "rel_l2_velocity_increment": 0.5414934168673128,
+      "rel_l2_pressure": 0.3822807656255747,
+      "rmse_velocity": 0.00947776805738289,
+      "rmse_pressure": 0.09536943066175581
+    },
+    "all": {
+      "rel_l2_velocity": 0.011210576038926622,
+      "rel_l2_velocity_increment": 0.5113127985629121,
+      "rel_l2_pressure": 0.3665629003995971,
+      "rmse_velocity": 0.009506367521454525,
+      "rmse_pressure": 0.09222631882347156
+    }
+  },
+  "rollout_horizons": {
+    "1": {
+      "rel_l2_velocity": {
+        "mean": 0.026230277288450853,
+        "median": 0.02563508683295295,
+        "max": 0.03284296967361584,
+        "n_finite": 10
+      },
+      "rel_l2_pressure": {
+        "mean": 0.6021546381857464,
+        "median": 0.6030774284944038,
+        "max": 0.6615175254455111,
+        "n_finite": 10
+      },
+      "rel_l2_vorticity": {
+        "mean": 0.16259002443250348,
+        "median": 0.16493855567984345,
+        "max": 0.20561209787496929,
+        "n_finite": 10
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.026230277288450853,
+        "median": 0.02563508683295295,
+        "max": 0.03284296967361584,
+        "n_finite": 10
+      },
+      "rmse_velocity": {
+        "mean": 0.045167590445144915,
+        "median": 0.042751236087718816,
+        "max": 0.08861194497418937,
+        "n_finite": 10
+      },
+      "rmse_pressure": {
+        "mean": 0.39683445229569914,
+        "median": 0.37307528501353737,
+        "max": 0.7506609542830729,
+        "n_finite": 10
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.052415975394125694,
+        "median": 0.05296973060608269,
+        "max": 0.05574018408726897,
+        "n_finite": 10
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 0.002167236268921381,
+        "median": 0.001535928053266844,
+        "max": 0.007938884894371499,
+        "n_finite": 10
+      }
+    },
+    "10": {
+      "rel_l2_velocity": {
+        "mean": 0.0764053169303121,
+        "median": 0.07058099357717314,
+        "max": 0.10425711738656246,
+        "n_finite": 10
+      },
+      "rel_l2_pressure": {
+        "mean": 0.4125490090573439,
+        "median": 0.3995502187682052,
+        "max": 0.6145652492505449,
+        "n_finite": 10
+      },
+      "rel_l2_vorticity": {
+        "mean": 0.22881013287449514,
+        "median": 0.21147749259509863,
+        "max": 0.32718100345725337,
+        "n_finite": 10
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.06154824580247644,
+        "median": 0.055534697903264985,
+        "max": 0.0958641623081933,
+        "n_finite": 10
+      },
+      "rmse_velocity": {
+        "mean": 0.08481842273854244,
+        "median": 0.06957237836278427,
+        "max": 0.1870872560395817,
+        "n_finite": 10
+      },
+      "rmse_pressure": {
+        "mean": 0.10380226568515687,
+        "median": 0.09109939741498604,
+        "max": 0.2196630987193777,
+        "n_finite": 10
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.18348180004307307,
+        "median": 0.1874793124184646,
+        "max": 0.2090211065282326,
+        "n_finite": 10
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 0.03638307289718565,
+        "median": 0.022516161036940513,
+        "max": 0.11406625859852601,
+        "n_finite": 10
+      }
+    },
+    "50": {
+      "rel_l2_velocity": {
+        "mean": 0.22435740556445452,
+        "median": 0.23887841144528932,
+        "max": 0.3065421323659637,
+        "n_finite": 10
+      },
+      "rel_l2_pressure": {
+        "mean": 0.5437704767735869,
+        "median": 0.5403804286164875,
+        "max": 0.8802952580479225,
+        "n_finite": 10
+      },
+      "rel_l2_vorticity": {
+        "mean": 0.38536394499626253,
+        "median": 0.39055002455308613,
+        "max": 0.4657435084760684,
+        "n_finite": 10
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.20279619888762634,
+        "median": 0.21018826530456225,
+        "max": 0.28923252804109306,
+        "n_finite": 10
+      },
+      "rmse_velocity": {
+        "mean": 0.18420898674225838,
+        "median": 0.18189275146137016,
+        "max": 0.3604746680939351,
+        "n_finite": 10
+      },
+      "rmse_pressure": {
+        "mean": 0.12921526315339193,
+        "median": 0.09849751497963664,
+        "max": 0.32076432408941813,
+        "n_finite": 10
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.3310845973057853,
+        "median": 0.3509128333086177,
+        "max": 0.3741590735051758,
+        "n_finite": 10
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 0.15018661213927026,
+        "median": 0.07749683441414149,
+        "max": 0.48605878119460866,
+        "n_finite": 10
+      }
+    },
+    "100": {
+      "rel_l2_velocity": {
+        "mean": 0.3876229987204296,
+        "median": 0.4173014023869601,
+        "max": 0.5510993188989783,
+        "n_finite": 10
+      },
+      "rel_l2_pressure": {
+        "mean": 0.7636133041412669,
+        "median": 0.6452382068529389,
+        "max": 1.7648930741616955,
+        "n_finite": 10
+      },
+      "rel_l2_vorticity": {
+        "mean": 0.6085896322463995,
+        "median": 0.6112055008271555,
+        "max": 0.7318363909951465,
+        "n_finite": 10
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.36887624743875813,
+        "median": 0.39830200716689335,
+        "max": 0.5311538920255284,
+        "n_finite": 10
+      },
+      "rmse_velocity": {
+        "mean": 0.30714184230198366,
+        "median": 0.27450344999735576,
+        "max": 0.6256267299679958,
+        "n_finite": 10
+      },
+      "rmse_pressure": {
+        "mean": 0.18805219255721023,
+        "median": 0.175074138274244,
+        "max": 0.5450636208805613,
+        "n_finite": 10
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.3850079386348814,
+        "median": 0.39473389934167985,
+        "max": 0.44074610807336434,
+        "n_finite": 10
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 0.2594210759631256,
+        "median": 0.12779536361340468,
+        "max": 0.836113640973374,
+        "n_finite": 10
+      }
+    },
+    "200": {
+      "rel_l2_velocity": {
+        "mean": 0.590851724416868,
+        "median": 0.5343608293448396,
+        "max": 1.0865965147177274,
+        "n_finite": 10
+      },
+      "rel_l2_pressure": {
+        "mean": 0.906117983081945,
+        "median": 0.8505008207726674,
+        "max": 1.8941482481687888,
+        "n_finite": 10
+      },
+      "rel_l2_vorticity": {
+        "mean": 0.8605496950966351,
+        "median": 0.7482574286005523,
+        "max": 1.5053500852492936,
+        "n_finite": 10
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.5860947722261437,
+        "median": 0.5304903127017715,
+        "max": 1.079600247339307,
+        "n_finite": 10
+      },
+      "rmse_velocity": {
+        "mean": 0.4493105081027279,
+        "median": 0.4474519233970895,
+        "max": 0.6957098687614666,
+        "n_finite": 10
+      },
+      "rmse_pressure": {
+        "mean": 0.25982166971708626,
+        "median": 0.24118155529429114,
+        "max": 0.5947333390393196,
+        "n_finite": 10
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.40627211983962475,
+        "median": 0.3914383502742229,
+        "max": 0.47561459619782054,
+        "n_finite": 10
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 0.6015866528001487,
+        "median": 0.34663799039342,
+        "max": 2.048133442836723,
+        "n_finite": 10
+      }
+    },
+    "299": {
+      "rel_l2_velocity": {
+        "mean": 0.6613962906152631,
+        "median": 0.5952249754570278,
+        "max": 1.0016426506853404,
+        "n_finite": 10
+      },
+      "rel_l2_pressure": {
+        "mean": 1.0771675683295594,
+        "median": 0.9155184695990031,
+        "max": 2.7314125113024827,
+        "n_finite": 10
+      },
+      "rel_l2_vorticity": {
+        "mean": 0.9028172458177117,
+        "median": 0.8177577564457285,
+        "max": 1.3469044797657732,
+        "n_finite": 10
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.6594038144515183,
+        "median": 0.5916227301914709,
+        "max": 1.0016386889909852,
+        "n_finite": 10
+      },
+      "rmse_velocity": {
+        "mean": 0.49879194363465035,
+        "median": 0.5518171925102349,
+        "max": 0.7216559987763848,
+        "n_finite": 10
+      },
+      "rmse_pressure": {
+        "mean": 0.27545068750183765,
+        "median": 0.2805820680843634,
+        "max": 0.574551883635525,
+        "n_finite": 10
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.4088380826920114,
+        "median": 0.3988535351420388,
+        "max": 0.4735487965648486,
+        "n_finite": 10
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 0.7349201504889037,
+        "median": 0.6439499804910577,
+        "max": 2.4156762959697438,
+        "n_finite": 10
+      }
+    },
+    "450": {
+      "rel_l2_velocity": {
+        "mean": 0.7678701604136265,
+        "median": 0.6910857773166917,
+        "max": 1.4754344821598906,
+        "n_finite": 10
+      },
+      "rel_l2_pressure": {
+        "mean": 1.2510714861925702,
+        "median": 0.9050476351251726,
+        "max": 2.8785745130934157,
+        "n_finite": 10
+      },
+      "rel_l2_vorticity": {
+        "mean": 1.0175528797773317,
+        "median": 0.8693323927864618,
+        "max": 2.0240405576192404,
+        "n_finite": 10
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.7634655695385156,
+        "median": 0.6864312495300827,
+        "max": 1.473604838456978,
+        "n_finite": 10
+      },
+      "rmse_velocity": {
+        "mean": 0.5413362843451143,
+        "median": 0.5478260357901855,
+        "max": 0.7523132383997758,
+        "n_finite": 10
+      },
+      "rmse_pressure": {
+        "mean": 0.2777151570710397,
+        "median": 0.2830117948373886,
+        "max": 0.5644237797666136,
+        "n_finite": 10
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.4108226351649389,
+        "median": 0.3978161844515414,
+        "max": 0.4745280526370721,
+        "n_finite": 10
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 1.1416069978749857,
+        "median": 0.8408654357895076,
+        "max": 3.275632816493626,
+        "n_finite": 10
+      }
+    },
+    "599": {
+      "rel_l2_velocity": {
+        "mean": 0.8327712471768083,
+        "median": 0.7112771831428384,
+        "max": 1.6715578747008182,
+        "n_finite": 10
+      },
+      "rel_l2_pressure": {
+        "mean": 1.198289196717962,
+        "median": 0.9231204442279265,
+        "max": 2.8853603094909785,
+        "n_finite": 10
+      },
+      "rel_l2_vorticity": {
+        "mean": 1.0164639721399373,
+        "median": 0.862628704797216,
+        "max": 1.9360846051947032,
+        "n_finite": 10
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.8303252983440718,
+        "median": 0.7094958661349358,
+        "max": 1.6715578747008182,
+        "n_finite": 10
+      },
+      "rmse_velocity": {
+        "mean": 0.5667545676805827,
+        "median": 0.618663290295451,
+        "max": 0.8446421404770194,
+        "n_finite": 10
+      },
+      "rmse_pressure": {
+        "mean": 0.2813459331412584,
+        "median": 0.27811730995851747,
+        "max": 0.5789295305295707,
+        "n_finite": 10
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.4113486775450192,
+        "median": 0.39882634525325644,
+        "max": 0.47465308721116556,
+        "n_finite": 10
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 1.6343294921669524,
+        "median": 1.324908494126342,
+        "max": 4.696783626976102,
+        "n_finite": 10
+      }
+    }
+  },
+  "rollout_time_mean": {
+    "window": {
+      "rel_l2_velocity": {
+        "mean": 0.4508686618025325,
+        "median": 0.43340839481825977,
+        "max": 0.7236340871684261,
+        "n_finite": 10
+      },
+      "rel_l2_pressure": {
+        "mean": 0.8054397733072973,
+        "median": 0.7247821172227384,
+        "max": 1.7937584783408482,
+        "n_finite": 10
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.439835060256514,
+        "median": 0.42048007427354006,
+        "max": 0.7124820057179855,
+        "n_finite": 10
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.3712174315291886,
+        "median": 0.36760216190975215,
+        "max": 0.427186232761911,
+        "n_finite": 10
+      }
+    },
+    "all": {
+      "rel_l2_velocity": {
+        "mean": 0.6036955803968798,
+        "median": 0.5304022752092924,
+        "max": 1.0737771127512277,
+        "n_finite": 10
+      },
+      "rel_l2_pressure": {
+        "mean": 0.9931367494653752,
+        "median": 0.8098194967209689,
+        "max": 2.2808037246294783,
+        "n_finite": 10
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.5965623713665748,
+        "median": 0.52347815453135,
+        "max": 1.0676987075536253,
+        "n_finite": 10
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.39094191967827285,
+        "median": 0.38545331966836305,
+        "max": 0.45047701057928846,
+        "n_finite": 10
+      }
+    }
+  },
+  "trajectories_with_nonfinite_error": 0,
+  "trajectories_with_velocity_error_above_1": 3,
+  "first_step_with_velocity_error_above_1": [
+    null,
+    508,
+    null,
+    299,
+    null,
+    null,
+    null,
+    null,
+    167,
+    null
+  ],
+  "rollout_ms_per_step": 42.831877128762166,
+  "evaluation_device": "mps"
+}
