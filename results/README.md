@@ -15,13 +15,7 @@ Tracked result files. Each study directory is a copy of a run directory without 
 | `<study>/mp<K>_seed<S>/rollout_curves.npz` | per test trajectory and rollout step: velocity, pressure and vorticity errors, RMSE, lag-minimised error and best lag, kinetic energy of prediction and reference, fixed-state baseline |
 | `<study>/mp<K>_seed<S>/node_stats.json`, `edge_stats.json` | normalisation statistics written by the upstream dataset class |
 
-Studies:
-
-| Study | Configuration | Device | Status |
-|---|---|---|---|
-| `local` | `configs/local.yaml`, 11,960 gradient steps per model | Apple MPS | LOCAL/REDUCED: run, 3 depths by 3 seeds |
-| `full` | `configs/full.yaml`, 119,600 gradient steps per model | CUDA | CUDA/FULL: PENDING, not run |
-| `official` | `configs/official.yaml`, 2,990,000 gradient steps | CUDA | PENDING, requires larger compute, not run |
+The stored `local` experiment contains three depths and three seeds, trained for 11,960 gradient steps per model on Apple MPS. CUDA evaluations of `full` and `official` are outside the reported results.
 
 Notes on `local`:
 

@@ -4,16 +4,11 @@ A parameter study built on the MeshGraphNet vortex-shedding example of [NVIDIA P
 
 **Question.** How does the capacity of MeshGraphNet, set by the number of message-passing steps, affect one-step prediction accuracy and the accumulation of error in autoregressive rollouts of vortex shedding?
 
-## Status of the experiments
+## Experimental scope
 
-| Study | Configuration | Gradient steps per model | Device | Status |
-|---|---|---|---|---|
-| Pipeline check | `configs/smoke.yaml` | 38 | CPU, Apple MPS | SMOKE: run, no results reported from it |
-| Reduced study | `configs/local.yaml` | 11,960 | Apple MPS | LOCAL/REDUCED: run, 9 models (3 depths, 3 seeds) |
-| Fixed-budget reduced study | `configs/full.yaml` | 119,600 | CUDA | CUDA/FULL: PENDING, not run |
-| NVIDIA's settings | `configs/official.yaml` | 2,990,000 | CUDA | PENDING, requires larger compute, not run |
+The reported experiment compares nine models: three processor depths and three seeds, each trained for 11,960 gradient steps on Apple MPS. This fixed-budget reduced study uses 0.4 % of the sample presentations in NVIDIA's configuration. All figures and metrics below describe this experiment.
 
-All numbers and figures below come from the `local` study. It trains each model for 0.4 % of the sample presentations of NVIDIA's configuration and is not a reproduction of NVIDIA's result. No CUDA result of any kind is reported in this repository.
+The repository also provides a 38-step pipeline check (`configs/smoke.yaml`), a single-GPU study with 119,600 gradient steps per model (`configs/full.yaml`), and NVIDIA's settings with 2,990,000 sample presentations (`configs/official.yaml`). CUDA throughput and accuracy have not been measured.
 
 ## Physical problem
 
@@ -81,7 +76,7 @@ The model is used through `physicsnemo.models.meshgraphnet.MeshGraphNet`; $K$ is
 | PhysicsNeMo commit | `b45a5c810c741e6b41f8515be24c51121f8fc21f` (main branch, 2 October 2026, version `2.3.0a0`) |
 | Licence | Apache-2.0 |
 
-The original trains one MeshGraphNet with 15 message-passing steps and hidden size 128 on the first 400 training trajectories and the first 300 time levels of each. One training sample is one (trajectory, time step) pair and the batch size is 1 per GPU. The loss is the mean squared error of the normalised targets. The optimiser is Adam with a learning rate of $10^{-4}$ multiplied by 0.9999991 after every gradient step. Training runs for 25 epochs, which is 2,990,000 sample presentations. The example's README reports 8 NVIDIA A100 GPUs with data parallelism. `inference.py` rolls the model out from the initial condition on 10 test trajectories for 300 steps and writes animations; the example computes no error metrics.
+The original trains one MeshGraphNet with 15 message-passing steps and hidden size 128 on the first 400 training trajectories and the first 300 time levels of each. One training sample is one (trajectory, time step) pair and the batch size is 1 per GPU. The loss is the mean squared error of the normalised targets. The optimiser is Adam with a learning rate of $10^{-4}$ multiplied by 0.9999991 after every gradient step. Training runs for 25 epochs, which is 2,990,000 sample presentations. The example's README reports 8 NVIDIA A100 GPUs with data parallelism. `inference.py` rolls the model out from the initial condition on 10 test trajectories for 299 prediction steps (300 time levels) and writes animations; the example computes no error metrics.
 
 Two statements of the example's README differ from its code at this commit: the README describes 1000 training samples and 600 time steps, while `config.yaml` uses 400 trajectories and 300 time steps. This repository follows the code.
 
@@ -162,7 +157,7 @@ Lift, drag and Strouhal number are not computed. They would need boundary stress
 
 ## Results
 
-All results are from the `local` study (status LOCAL/REDUCED): 9 models, 3 depths by 3 seeds, 11,960 gradient steps each on 40 training trajectories, evaluated on 10 test trajectories with 599-step rollouts, on an Apple M3 Pro (MPS, PyTorch 2.13.0). Values are means over test trajectories; where a spread is given it is the sample standard deviation over the 3 seeds. The files are in [`results/local`](results/local).
+All results are from the fixed-budget reduced `local` study: 9 models, 3 depths by 3 seeds, 11,960 gradient steps each on 40 training trajectories, evaluated on 10 test trajectories with 599-step rollouts, on an Apple M3 Pro (MPS, PyTorch 2.13.0). Values are means over test trajectories; where a spread is given it is the sample standard deviation over the 3 seeds. The files are in [`results/local`](results/local).
 
 ### One-step prediction
 
@@ -220,7 +215,7 @@ Per seed, mean velocity error over steps 1 to 299, and in brackets the number of
 
 ![Horizontal velocity at step 299 for the three depths](figures/local_fields_by_depth.png)
 
-Read together: within this budget, additional message-passing steps buy a measurable gain in one-step accuracy, most clearly in the pressure, and no measurable gain in long-horizon accuracy. The limiting factor of the rollouts here is the amount of training, not the processor depth. Whether deeper processors pay off once the models are trained far enough to hold a vortex street is the question the `full` study is designed to address.
+Read together: within this budget, additional message-passing steps buy a measurable gain in one-step accuracy, most clearly in the pressure, and no measurable gain in long-horizon accuracy. These results are consistent with insufficient training, but varying depth at one budget cannot establish the cause of the rollout errors. Comparing training budgets at fixed depth would help distinguish optimisation limits from capacity limits.
 
 ### Computational cost
 
@@ -315,7 +310,7 @@ It exits with code 3 if the projection exceeds the budget and never changes the 
 
 `kaggle/run_cuda.ipynb` checks out one commit by its full SHA, verifies `HEAD` and a clean tree, prints the GPU and all package versions, runs the tests, downloads 200, 10 and 50 trajectories (3.5 GB), runs the smoke study on CUDA and then the probe. The study starts only if `RUN_FULL = True` and the projection fits the remaining session budget; otherwise the notebook stops and reports the numbers without reducing epochs, seeds, data or model sizes. `RUN_OFFICIAL` controls NVIDIA's configuration separately and is off by default.
 
-The cost on a Kaggle GPU has not been measured. From the measured cost ratio between depths and typical throughput of a T4 for graphs of this size, a rough expectation is 2 to 3 hours per seed and 6 to 9 hours for the three seeds of `configs/full.yaml`, and several days for `configs/official.yaml`, which is why the latter is not expected to fit a single session. The probe replaces this estimate with a measurement before anything is started.
+Kaggle runtime has not been measured. Apple MPS timings do not establish T4 or P100 throughput. The launcher measures throughput and memory on the assigned GPU, projects the complete study duration, and checks the session budget before training.
 
 After a CUDA run, the downloaded archive is integrated with
 
