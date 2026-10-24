@@ -76,7 +76,7 @@ The model is used through `physicsnemo.models.meshgraphnet.MeshGraphNet`; $K$ is
 | PhysicsNeMo commit | `b45a5c810c741e6b41f8515be24c51121f8fc21f` (main branch, 2 October 2026, version `2.3.0a0`) |
 | Licence | Apache-2.0 |
 
-The original trains one MeshGraphNet with 15 message-passing steps and hidden size 128 on the first 400 training trajectories and the first 300 time levels of each. One training sample is one (trajectory, time step) pair and the batch size is 1 per GPU. The loss is the mean squared error of the normalised targets. The optimiser is Adam with a learning rate of $10^{-4}$ multiplied by 0.9999991 after every gradient step. Training runs for 25 epochs, which is 2,990,000 sample presentations. The example's README reports 8 NVIDIA A100 GPUs with data parallelism. `inference.py` rolls the model out from the initial condition on 10 test trajectories for 299 prediction steps (300 time levels) and writes animations; the example computes no error metrics.
+The original trains one MeshGraphNet with 15 message-passing steps and hidden size 128 on the first 400 training trajectories and the first 300 time levels of each. One training sample is one (trajectory, time step) pair and the batch size is 1 per GPU. The loss is the mean squared error of the normalised targets. The optimiser is Adam with a learning rate of $10^{-4}$ multiplied by 0.9999991 after every gradient step. Training runs for 25 epochs, which is 2,990,000 sample presentations. The example's README reports 8 NVIDIA A100 GPUs with data parallelism. With 8 data-parallel ranks and a batch of 1 per rank, the gradient is averaged over 8 samples and the optimiser takes 373,750 steps, so the learning rate decays to 0.71 of its initial value; on one device the same configuration takes 2,990,000 steps of batch 1 and the learning rate decays to 0.07 of its initial value. `configs/official.yaml` reproduces the configuration file, not this 8-GPU optimisation trajectory. `inference.py` rolls the model out from the initial condition on 10 test trajectories for 299 prediction steps (300 time levels) and writes animations; the example computes no error metrics.
 
 Two statements of the example's README differ from its code at this commit: the README describes 1000 training samples and 600 time steps, while `config.yaml` uses 400 trajectories and 300 time steps. This repository follows the code.
 
@@ -123,8 +123,9 @@ Three properties of the upstream dataset class matter for the design and were ke
 | Training trajectories (first $N$ of `train.tfrecord`) | 40 | 200 | 400 |
 | Time levels per trajectory | 300 | 300 | 300 |
 | Epochs | 1 | 2 | 25 |
-| Gradient steps per model | 11,960 | 119,600 | 2,990,000 |
-| Share of the upstream budget | 0.4 % | 4 % | 100 % |
+| Gradient steps per model (one device, batch 1) | 11,960 | 119,600 | 2,990,000 |
+| Share of the upstream sample presentations | 0.4 % | 4 % | 100 % |
+| Share of the 373,750 optimiser steps of NVIDIA's 8-GPU run | 3.2 % | 32 % | not comparable (batch 1 instead of 8) |
 | Processor sizes | 5, 10, 15 | 5, 10, 15 | 15 |
 | Seeds | 0, 1, 2 | 0, 1, 2 | 0 |
 | Validation trajectories | 5 | 10 | 10 |
@@ -194,10 +195,10 @@ Per seed, mean velocity error over steps 1 to 299, and in brackets the number of
 
 ![Rollout error against time](figures/local_rollout_error.png)
 
-- **No depth gives a usable rollout at this budget.** After roughly 100 steps every depth is worse on average than holding the initial velocity fixed, and the mean error exceeds 1 at the end of the rollout for all depths. Only two of the nine runs, both with seed 0 (5 and 10 steps), stay below the fixed-state baseline over the training window.
+- **No depth gives a usable rollout at this budget.** The mean error over seeds and test trajectories rises above the error of holding the initial velocity fixed at step 78 (15 steps), 86 (5 steps) or 100 (10 steps) and stays above it, and the mean error exceeds 1 at the end of the rollout for all depths. Only two of the nine runs, both with seed 0 (5 and 10 steps), have a lower mean error over the training window than the fixed-state baseline; neither stays below it at every step (they cross it at steps 176 and 274).
 - **The one-step ranking does not carry over to the rollout.** The deepest model has the lowest one-step error in every seed but the lowest rollout error in only one seed. The 10-step model is best in two seeds and in the mean, but the differences between depths (0.48 to 0.62) are smaller than the spread over seeds (0.18 to 0.24). The data do not support a ranking of depths by rollout error.
 - **The seed matters more than the depth.** Seed 0 gives clearly lower rollout errors than seeds 1 and 2 at every depth, although its one-step errors are only slightly lower. The seed fixes the training noise, the initial weights and the sample order.
-- The pressure error behaves the same way: it is 0.4 to 0.5 after ten steps and above 1 from about step 150, with no consistent ordering by depth.
+- The pressure error behaves the same way: it is 0.4 to 0.5 after ten steps and above 1 from step 109 to 167 depending on depth, with no consistent ordering by depth.
 
 ![Error against depth](figures/local_error_vs_depth.png)
 
@@ -205,9 +206,9 @@ Per seed, mean velocity error over steps 1 to 299, and in brackets the number of
 
 ![Error accumulation diagnostics](figures/local_error_accumulation.png)
 
-- **Growth is gradual, not explosive.** The velocity error rises quickly over the first 50 steps and then keeps growing more slowly. No rollout produced non-finite values. The predictions leave the reference without diverging numerically within 599 steps.
-- **The error is not a phase error.** The lag-minimised error is 0.47 to 0.62 over the training window against 0.48 to 0.62 without a shift: the best time shift of up to 40 steps removes 1 to 2 % of the error. A shift helps slightly during the first 100 steps and not at all afterwards. The rollouts do not reproduce the reference wake at a different phase; they produce a different flow.
-- **The kinetic energy drifts upward.** The predicted kinetic energy exceeds the reference by a factor of 2 to 4 at step 299 on average (relative error 1.1 to 3.0) and keeps growing during the extrapolation. The models add energy at every step. The drift is smallest for the 10-step models, consistent with their lower velocity error, with the same caveat about the seed spread.
+- **The averaged growth is gradual; single trajectories are not.** The mean velocity error rises quickly over the first 50 steps and then keeps growing more slowly. No rollout produced non-finite values within 599 steps. Individual trajectories behave worse than the averages: at step 599 the largest velocity error of a single trajectory is 10.6 and its kinetic energy is 115 times the reference (15 steps, seed 1, a slow steady test case), and five of the nine runs have a trajectory whose energy exceeds the reference more than tenfold.
+- **The error is not mainly a phase error.** The lag-minimised error is 0.47 to 0.62 over the training window against 0.48 to 0.62 without a shift: the best time shift of up to 40 steps removes 1 to 2 % of the error. The seven shedding test trajectories have reference periods of 25 to 60 steps, so a shift of at most 40 steps can align any phase. On these trajectories a shift removes about 10 % of the error over steps 10 to 99 and about 1 % (at most 9 % for one trajectory and run) over steps 100 to 299. The rollouts do not reproduce the reference wake at a different phase; they produce a different flow. An independent rerun of three models (5 steps seed 0, 10 steps seed 0, 15 steps seed 1) shows why: at a probe three diameters behind the cylinder the predicted cross-stream velocity carries at most 5 % of the reference's spectral power at the shedding frequency, so the predicted wakes stop shedding ([`docs/ROLLOUT_VERIFICATION.md`](docs/ROLLOUT_VERIFICATION.md)). The lag-minimised error cannot separate a phase error from an amplitude error when both are present, and the energy drift below shows that the amplitude is wrong.
+- **The kinetic energy drifts upward.** The predicted kinetic energy exceeds the reference by a factor of 2 to 4 at step 299 on average (relative error 1.1 to 3.0) and keeps growing during the extrapolation. The drift is not monotone in every case: at step 10 the ratio is within 3 % of 1 and about half of the run and trajectory pairs are below the reference, while at step 299 86 % are above it. The drift is smallest for the 10-step models, consistent with their lower velocity error, with the same caveat about the seed spread.
 - **The wake is not reproduced.** In the most unsteady test trajectory the reference develops a vortex street, while the rollout of the 15-step model keeps an attached, nearly steady wake and loses the shed vortices (figure below). Short rollouts of 10 steps look accurate (8 % error) and say nothing about this.
 - **Leaving the training time window changes nothing visible.** The curves continue smoothly across step 299; the error is already large before the extrapolation starts.
 
@@ -246,6 +247,12 @@ MeshGraphNet from PhysicsNeMo runs on Apple MPS without changes, including the `
 - The test trajectories are the first of the test file, and the time window is the first 600 steps from the initial condition, which includes the transient in which the wake develops.
 - Only the processor depth was varied. Hidden size, noise level, learning rate and training-set size were held fixed, and interactions between them and depth were not studied.
 - The properties of the upstream dataset class listed above (noise drawn once, statistics computed after the noise) were kept, so that the models are trained by NVIDIA's pipeline. Their effect on the results was not measured.
+- PhysicsNeMo's pipeline, and therefore this study, differs from DeepMind's original MeshGraphNets training for this dataset: DeepMind draws new training noise every time a sample is used, restricts the loss to interior and outflow nodes, predicts velocity only, and trains for 10 million steps. The results describe the PhysicsNeMo pipeline, not the original method.
+- Three of the ten test trajectories have a steady wake. Averages over the ten trajectories mix steady and shedding cases.
+
+## Verification
+
+An independent audit of the implementation, the data handling, the metrics and the reported claims is in [`docs/SCIENTIFIC_AUDIT.md`](docs/SCIENTIFIC_AUDIT.md), with the comparison against NVIDIA's example in [`docs/UPSTREAM_COMPARISON.md`](docs/UPSTREAM_COMPARISON.md), the rollout checks in [`docs/ROLLOUT_VERIFICATION.md`](docs/ROLLOUT_VERIFICATION.md) and the open experiments in [`docs/EXPERIMENT_GAPS.md`](docs/EXPERIMENT_GAPS.md). The scripts in [`audit/`](audit) reproduce its numbers.
 
 ## Possible extensions
 
@@ -262,7 +269,10 @@ configs/            official.yaml (upstream settings), smoke.yaml, local.yaml, f
 src/mgn_vortex/     config, data access, model construction, training engine, rollout,
                     metrics, mesh operators, evaluation, study loop, plotting, run metadata
 scripts/            download_data.py, train.py, evaluate.py, plot_results.py, probe.py, results.py
-tests/              unit and pipeline tests on a synthetic dataset in the upstream file format
+tests/              unit and pipeline tests on a synthetic dataset in the upstream file format,
+                    and consistency tests of the published results
+audit/              independent checks of the data, the stored metrics and the rollout
+docs/               scientific audit, upstream comparison, rollout verification, experiment gaps
 kaggle/             run_cuda.ipynb, launcher for a CUDA session
 results/            tracked summaries, metrics, histories and error curves of the studies
 figures/            figures of the README
@@ -278,6 +288,8 @@ pip install "torch>=2.13" setuptools wheel
 FORCE_ONLY_CPU=1 pip install torch_scatter --no-build-isolation
 pip install -r requirements.txt
 ```
+
+`requirements-lock.txt` lists the exact package versions of the environment that trained and evaluated the reported study.
 
 The CPU-only build of `torch_scatter` is sufficient on CUDA and MPS, because MeshGraphNet uses its sum aggregation, which is implemented with `torch.scatter_add_`. This was verified on CPU and Apple MPS (macOS arm64, PyTorch 2.13.0, `torch_geometric` 2.8, `torch_scatter` 2.1.2), where the forward pass on MPS agrees with CPU to $5\times10^{-7}$.
 
@@ -328,7 +340,7 @@ python -m pytest -q
 PHYSICSNEMO_UPSTREAM=/path/to/physicsnemo python -m pytest -q   # adds the comparisons with the upstream files
 ```
 
-The tests write a small synthetic dataset in the format of the DeepMind files and need neither the real data nor a GPU. They cover the configurations (upstream values kept, reduced studies change only budget keys), TFRecord counting and partial download, graph construction and features, parameter counts and the forward pass, agreement of MPS with CPU, the metrics and mesh operators on fields with known answers, the rollout (reference reproduction with an oracle, fixed boundary nodes, agreement with NVIDIA's rollout), reproducibility of training for a fixed seed, checkpoint round trips, the study outputs, and the structure of the Kaggle launcher.
+The tests write a small synthetic dataset in the format of the DeepMind files and need neither the real data nor a GPU. They cover the configurations (upstream values kept, reduced studies change only budget keys), TFRecord counting and partial download, graph construction and features, parameter counts and the forward pass, agreement of MPS with CPU, the metrics and mesh operators on fields with known answers, the rollout (reference reproduction with an oracle, fixed boundary nodes, agreement with NVIDIA's rollout), reproducibility of training for a fixed seed, checkpoint round trips, the study outputs, and the structure of the Kaggle launcher. `tests/test_results.py` recomputes the published aggregates of `results/local` from the stored error curves and checks the quantitative statements of the Results section.
 
 ## Attribution
 

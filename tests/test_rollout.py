@@ -73,6 +73,23 @@ def test_one_step_uses_reference_inputs(test_set):
         rollout(model, test_set, 0, CPU, autoregressive=True, stride=2)
 
 
+def test_rollout_feeds_back_predictions_not_reference_states(test_set):
+    """Every autoregressive input after the first is the previous prediction, never a reference state."""
+    seen = []
+
+    def recording(node_features, edge_features, graph):
+        seen.append(node_features[:, 0:2].clone())
+        return torch.full_like(graph.y, 0.5)  # a constant normalised increment, so predictions leave the reference
+
+    out = rollout(recording, test_set, 0, CPU, autoregressive=True)
+    stats = test_set.node_stats
+    inputs = [x * stats["velocity_std"] + stats["velocity_mean"] for x in seen]
+    assert np.allclose(inputs[0].numpy(), out["input_velocity"][0], atol=1e-5)  # reference initial condition
+    for k in range(1, len(inputs)):
+        assert np.allclose(inputs[k].numpy(), out["pred"][k - 1][:, :2], atol=1e-5)
+        assert not np.allclose(inputs[k].numpy(), out["input_velocity"][k], atol=1e-3)
+
+
 def build_model_small():
     from mgn_vortex.config import load_config
 
