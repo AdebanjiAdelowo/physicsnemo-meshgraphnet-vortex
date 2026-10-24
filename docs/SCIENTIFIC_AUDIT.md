@@ -6,7 +6,7 @@ Independent audit of the message-passing depth study built on NVIDIA PhysicsNeMo
 - Upstream reference: `NVIDIA/physicsnemo` commit `b45a5c810c741e6b41f8515be24c51121f8fc21f`, `examples/cfd/vortex_shedding_mgn`.
 - Scope of the reported experiment: 9 models (K = 5, 10, 15 message-passing steps; seeds 0, 1, 2), each trained for 11,960 gradient steps of batch 1 on 40 training trajectories on Apple MPS (M3 Pro, PyTorch 2.13.0) and evaluated on 10 test trajectories with 599-step rollouts. This is a fixed-budget reduced study. It is 0.4 % of the 2,990,000 sample presentations of NVIDIA's configuration and 3.2 % of the 373,750 optimiser steps of NVIDIA's reported 8-GPU run. It is not a reproduction of NVIDIA's training. VERIFIED from `results/local/*/train_metrics.json` and `study_metadata.json`.
 
-Companion documents: [UPSTREAM_COMPARISON.md](UPSTREAM_COMPARISON.md), [ROLLOUT_VERIFICATION.md](ROLLOUT_VERIFICATION.md), [EXPERIMENT_GAPS.md](EXPERIMENT_GAPS.md). Scripts: [`audit/`](../audit). Regression tests: `tests/test_results.py`, `tests/test_rollout.py::test_rollout_feeds_back_predictions_not_reference_states`.
+Companion documents: [UPSTREAM_COMPARISON.md](UPSTREAM_COMPARISON.md), [ROLLOUT_VERIFICATION.md](ROLLOUT_VERIFICATION.md), [LONG_HORIZON_DIAGNOSTICS.md](LONG_HORIZON_DIAGNOSTICS.md) (nine-run shedding, phase, wake and energy diagnostics, added after this audit), [EXPERIMENT_GAPS.md](EXPERIMENT_GAPS.md). Scripts: [`audit/`](../audit). Regression tests: `tests/test_results.py`, `tests/test_rollout.py::test_rollout_feeds_back_predictions_not_reference_states`.
 
 ## 1. Verdict
 
@@ -39,7 +39,7 @@ At this budget the study shows a consistent but small one-step gain with depth, 
 | E17 | Pressure error above 1 "from about step 150" | crossings at steps 109, 145, 167 | SUPPORTED BUT LIMITED, corrected |
 | E18 | Growth gradual, "not explosive" | averages: yes; no non-finite values; single trajectories reach E_u 10.6 and 115x reference energy | SUPPORTED BUT LIMITED, qualified |
 | E19 | "The error is not a phase error" | shedding periods 25 to 60 steps (within the ±40 window); a shift removes about 10 % of the error over steps 10 to 99 and about 1 % after step 100 on shedding trajectories | SUPPORTED BUT LIMITED, qualified ("not mainly") |
-| E19b | Predicted wakes stop shedding | probe band power at most 5 % of the reference in mp05_seed0 (7 shedding trajectories), mp10_seed0 and mp15_seed1 (2 each) | SUPPORTED BUT LIMITED (3 of 9 runs) |
+| E19b | Predicted wakes stop shedding | probe band power at most 5 % of the reference in mp05_seed0 (7 shedding trajectories), mp10_seed0 and mp15_seed1 (2 each). Extended to all 9 runs and 7 shedding trajectories each, from rollouts regenerated on CPU that match the stored curves to 3.5e-5: shedding preserved in 0 of 63 pairs after step 100; in-band amplitude below half the reference by step 53 (median) at every depth (LONG_HORIZON_DIAGNOSTICS.md) | VERIFIED (9 of 9 runs) |
 | E20 | Kinetic energy ratio 2 to 4 at step 299, smallest for K = 10 | seed means 3.99, 1.96, 2.97 | VERIFIED |
 | E21 | "The models add energy at every step" | at step 10, 46 % of (run, trajectory) pairs are below the reference energy | INCORRECT as stated; replaced |
 | E22 | Cost linear in depth (MPS probe) | 37.7, 70.7, 104.0 ms per step; increments 33.0 and 33.3 ms per 5 layers | VERIFIED (MPS only) |
@@ -47,6 +47,8 @@ At this budget the study shows a consistent but small one-step gain with depth, 
 | E24 | CPU-only `torch_scatter` build works on CUDA | correct by reading the code (sum reduction only); not executed on CUDA | UNVERIFIED |
 | E25 | Kaggle launcher and `full` / `official` studies | statically tested only | UNVERIFIED (as the README states) |
 | E26 | Velocity in m/s | the files do not state units | UNVERIFIED (minor) |
+| E27 | Depth does not change the long-horizon dynamics at this budget | 63 metrics x (slope + 3 paired differences): 10 of 252 intervals exclude zero, 5 of them one-step effects; the rest at the chance rate (LONG_HORIZON_DIAGNOSTICS.md section 4) | SUPPORTED BUT LIMITED (3 seeds) |
+| E28 | Pressure-error step near step 327 | reference pressure of test trajectory 7 jumps 12 % in norm between time levels 326 and 327 with smooth velocity; a data feature | VERIFIED |
 
 ## 3. Experimental control
 
@@ -122,4 +124,4 @@ Ordered by value (details, commands and resource estimates in [EXPERIMENT_GAPS.m
 3. Checkpoint averaging and multi-checkpoint evaluation to separate checkpoint noise from seed effects.
 4. Per-use noise resampling and an interior-and-outflow loss mask, as in DeepMind's original.
 5. More seeds (5 to 10) before any claim about a depth effect on rollouts.
-6. Frequency and amplitude diagnostics for every shedding trajectory and run (done for 3 of 9 runs: no shedding in the predictions).
+6. Frequency and amplitude diagnostics for every shedding trajectory and run. Done for all 9 runs in [LONG_HORIZON_DIAGNOSTICS.md](LONG_HORIZON_DIAGNOSTICS.md): no run preserves shedding; depth has no detectable effect on any long-horizon quantity.

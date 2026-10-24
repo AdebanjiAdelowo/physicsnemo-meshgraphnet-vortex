@@ -14,6 +14,9 @@ Tracked result files. Each study directory is a copy of a run directory without 
 | `<study>/mp<K>_seed<S>/eval_metrics.json` | one-step errors, rollout errors at the tabulated horizons, time means, counts of trajectories with large or non-finite errors |
 | `<study>/mp<K>_seed<S>/rollout_curves.npz` | per test trajectory and rollout step: velocity, pressure and vorticity errors, RMSE, lag-minimised error and best lag, kinetic energy of prediction and reference, fixed-state baseline |
 | `<study>/mp<K>_seed<S>/node_stats.json`, `edge_stats.json` | normalisation statistics written by the upstream dataset class |
+| `<study>/long_horizon/<run>.npz` | written by `scripts/long_horizon.py`: per test trajectory, predicted (u, v, p) at 7 wake probes and the peak nodal speed at every step, centreline time-mean u and RMS v' and wake unsteadiness per window, and the agreement of the regenerated rollout with `rollout_curves.npz` |
+| `<study>/long_horizon/reference.npz` | the same series for the reference, probe and centreline node indices and positions, cylinder centre and diameter |
+| `<study>/long_horizon/summary.json`, `tables.md` | written by `scripts/long_horizon_analysis.py`: spectral, phase, wake, energy and threshold diagnostics per trajectory, run and depth, with seed intervals and depth slopes |
 
 The stored `local` experiment contains three depths and three seeds, trained for 11,960 gradient steps per model on Apple MPS. CUDA evaluations of `full` and `official` are outside the reported results.
 

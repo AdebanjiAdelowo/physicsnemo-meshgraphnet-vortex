@@ -10,4 +10,6 @@ Independent checks behind [`docs/SCIENTIFIC_AUDIT.md`](../docs/SCIENTIFIC_AUDIT.
 | `independent_rollout.py <repo> <out.npz> <run> ...` | data and checkpoints in `runs/local` | rollout from raw TFRecords with its own graph construction, normalisation and metrics; compares with the stored curves. `TRAJ=0,6` restricts the trajectories |
 | `probe_spectrum.py <out.npz>` | output of `independent_rollout.py` | shedding period, band power and correlation of the predicted and reference probe signal; pooled one-step increment error |
 
+The nine-run long-horizon diagnostics use `scripts/long_horizon.py` (regeneration through the repository pipeline, checked against the stored curves) and `scripts/long_horizon_analysis.py` (tracked files only); see [`docs/LONG_HORIZON_DIAGNOSTICS.md`](../docs/LONG_HORIZON_DIAGNOSTICS.md). They reproduce the numbers of `probe_spectrum.py` for the three runs it covered.
+
 Run them with the project environment, for example `.venv/bin/python audit/recompute_aggregates.py results/local`. The first two are also covered by `tests/test_results.py`.

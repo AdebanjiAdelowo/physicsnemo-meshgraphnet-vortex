@@ -11,7 +11,7 @@ What the reported `local` study cannot answer, and the experiments that would an
 | G3 | Does any depth produce a rollout better than persistence at a realistic budget? | At this budget none does on average after step 78 to 100. |
 | G4 | How much of the seed effect is checkpoint noise? | Each run is evaluated at a single final checkpoint. Validation loss changes by up to 53 % between the last two evaluations (for example 0.053 to 0.077 for mp15_seed1), so the run-to-run spread mixes seed effects and where the last step landed. |
 | G5 | Does per-use noise resampling (as in DeepMind's original) or a loss restricted to interior and outflow nodes improve stability? | Both are inherited PhysicsNeMo choices and are fixed in every run. |
-| G6 | Are shedding frequency and amplitude reproduced for the shedding trajectories? | Only a probe-signal check on a few (run, trajectory) pairs exists (`ROLLOUT_VERIFICATION.md`); no Strouhal number or force coefficients. |
+| G6 | Are shedding frequency and amplitude reproduced for the shedding trajectories? | Answered at this budget for all 9 runs ([LONG_HORIZON_DIAGNOSTICS.md](LONG_HORIZON_DIAGNOSTICS.md)): no; shedding decays within one to two periods at every depth. Open at larger budgets. No Strouhal number or force coefficients (no viscosity in the files). |
 | G7 | Does the result hold on a representative test set? | 10 trajectories, the first of the test file; 3 of them have a steady wake. |
 | G8 | Comparison at equal compute instead of equal steps. | Not run. |
 
@@ -48,4 +48,4 @@ python scripts/train.py --config full --resume                         # P2
 ## 4. Local follow-ups (CPU, no GPU needed)
 
 - Full independent CPU rollout of all nine runs with `audit/independent_rollout.py` (about 1 to 6 hours per run on a loaded laptop CPU). Only run mp05_seed0 (all trajectories) and two shedding trajectories of mp10_seed0 and mp15_seed1 were repeated in this audit.
-- Probe-spectrum analysis for every run and shedding trajectory (`audit/probe_spectrum.py`), to quantify frequency and amplitude errors beyond the lag-minimised error.
+- Probe-spectrum analysis for every run and shedding trajectory: done with `scripts/long_horizon.py` and `scripts/long_horizon_analysis.py` (the rollouts were regenerated through the repository's own pipeline on CPU and match the stored curves to 3.5e-5; this also covers the regeneration of all nine runs from their checkpoints). See [LONG_HORIZON_DIAGNOSTICS.md](LONG_HORIZON_DIAGNOSTICS.md). The P1 protocol there fixes the long-horizon outcomes, decision rules and resources for the budget-scaling study.

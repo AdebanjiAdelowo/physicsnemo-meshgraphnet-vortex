@@ -207,7 +207,7 @@ Per seed, mean velocity error over steps 1 to 299, and in brackets the number of
 ![Error accumulation diagnostics](figures/local_error_accumulation.png)
 
 - **The averaged growth is gradual; single trajectories are not.** The mean velocity error rises quickly over the first 50 steps and then keeps growing more slowly. No rollout produced non-finite values within 599 steps. Individual trajectories behave worse than the averages: at step 599 the largest velocity error of a single trajectory is 10.6 and its kinetic energy is 115 times the reference (15 steps, seed 1, a slow steady test case), and five of the nine runs have a trajectory whose energy exceeds the reference more than tenfold.
-- **The error is not mainly a phase error.** The lag-minimised error is 0.47 to 0.62 over the training window against 0.48 to 0.62 without a shift: the best time shift of up to 40 steps removes 1 to 2 % of the error. The seven shedding test trajectories have reference periods of 25 to 60 steps, so a shift of at most 40 steps can align any phase. On these trajectories a shift removes about 10 % of the error over steps 10 to 99 and about 1 % (at most 9 % for one trajectory and run) over steps 100 to 299. The rollouts do not reproduce the reference wake at a different phase; they produce a different flow. An independent rerun of three models (5 steps seed 0, 10 steps seed 0, 15 steps seed 1) shows why: at a probe three diameters behind the cylinder the predicted cross-stream velocity carries at most 5 % of the reference's spectral power at the shedding frequency, so the predicted wakes stop shedding ([`docs/ROLLOUT_VERIFICATION.md`](docs/ROLLOUT_VERIFICATION.md)). The lag-minimised error cannot separate a phase error from an amplitude error when both are present, and the energy drift below shows that the amplitude is wrong.
+- **The error is not mainly a phase error.** The lag-minimised error is 0.47 to 0.62 over the training window against 0.48 to 0.62 without a shift: the best time shift of up to 40 steps removes 1 to 2 % of the error. The seven shedding test trajectories have reference periods of 25 to 60 steps, so a shift of at most 40 steps can align any phase. On these trajectories a shift removes about 10 % of the error over steps 10 to 99 and about 1 % (at most 9 % for one trajectory and run) over steps 100 to 299. The rollouts do not reproduce the reference wake at a different phase; they produce a different flow. Wake probes in all nine rollouts show why: the predicted wakes stop shedding (next section). The lag-minimised error cannot separate a phase error from an amplitude error when both are present, and the energy drift below shows that the amplitude is wrong.
 - **The kinetic energy drifts upward.** The predicted kinetic energy exceeds the reference by a factor of 2 to 4 at step 299 on average (relative error 1.1 to 3.0) and keeps growing during the extrapolation. The drift is not monotone in every case: at step 10 the ratio is within 3 % of 1 and about half of the run and trajectory pairs are below the reference, while at step 299 86 % are above it. The drift is smallest for the 10-step models, consistent with their lower velocity error, with the same caveat about the seed spread.
 - **The wake is not reproduced.** In the most unsteady test trajectory the reference develops a vortex street, while the rollout of the 15-step model keeps an attached, nearly steady wake and loses the shed vortices (figure below). Short rollouts of 10 steps look accurate (8 % error) and say nothing about this.
 - **Leaving the training time window changes nothing visible.** The curves continue smoothly across step 299; the error is already large before the extrapolation starts.
@@ -216,7 +216,32 @@ Per seed, mean velocity error over steps 1 to 299, and in brackets the number of
 
 ![Horizontal velocity at step 299 for the three depths](figures/local_fields_by_depth.png)
 
-Read together: within this budget, additional message-passing steps buy a measurable gain in one-step accuracy, most clearly in the pressure, and no measurable gain in long-horizon accuracy. These results are consistent with insufficient training, but varying depth at one budget cannot establish the cause of the rollout errors. Comparing training budgets at fixed depth would help distinguish optimisation limits from capacity limits.
+### Long-horizon wake dynamics
+
+The rollouts of all nine models were repeated on the CPU from their checkpoints, with the same code and initial conditions (the regenerated error curves match the stored ones to $4\times10^{-5}$), and the velocity and pressure were recorded at probes from 1 to 8 diameters behind the cylinder and along the wake centreline. The same estimators, windows and thresholds are applied to every run. Full tables, protocol and statistics: [`docs/LONG_HORIZON_DIAGNOSTICS.md`](docs/LONG_HORIZON_DIAGNOSTICS.md).
+
+| | $K=5$ | $K=10$ | $K=15$ |
+|---|---|---|---|
+| Shedding trajectories with shedding preserved after step 100 | 0 of 21 | 0 of 21 | 0 of 21 |
+| First step with shedding amplitude below half the reference (median) | 53 ± 7 | 52 ± 6 | 47 ± 2 |
+| Dominant probe frequency / shedding frequency, steps 300 to 599 | 0.13 ± 0.02 | 0.19 ± 0.05 | 0.19 ± 0.05 |
+| First step above the persistence error (median) | 108 ± 61 | 255 ± 282 | 89 ± 33 |
+| Velocity error, steps 300 to 599 | 1.44 ± 0.58 | 1.02 ± 0.47 | 1.35 ± 1.05 |
+| Kinetic energy / reference, step 599 (median over trajectories) | 5.4 ± 2.9 | 2.8 ± 1.8 | 4.1 ± 3.7 |
+
+Mean ± standard deviation over 3 seeds. Shedding preserved: predicted dominant frequency within 0.7 to 1.3 times the reference shedding frequency and at least 25 % of the reference's spectral power in that band, at a probe 3 diameters downstream.
+
+- **Every model stops shedding within one to two periods.** The in-band amplitude of the predicted wake falls below half the reference at a median step of 53 (range 27 to 96) and is at most 43 % of it by step 100. The predicted probe signals become slow drifts at 0.1 to 0.3 times the shedding frequency, at every probe from 1 to 8 diameters downstream. The phase error is already 95 degrees (median) at step 50 in the cases that still shed; after that there is no oscillation to phase.
+- **The mean wake is wrong.** The predicted centreline velocity loses the recirculation and the wake deficit of the reference, which is the excess flow behind the kinetic-energy drift. The drift continues during the extrapolation at about 11 to 13 % per 100 steps at every depth. No rollout produces non-finite values; 12 of the 90 trajectory rollouts end with more than ten times the reference energy.
+- **Depth changes the one-step error and not the dynamics.** Every depth fails in the same order and at about the same time. Of 252 seed-level intervals for depth effects on 63 quantities, the ones that exclude zero are the one-step pressure and velocity errors and a few long-horizon differences no more frequent than chance. Lower one-step error goes with lower rollout error across runs, but that association comes from the seeds, not from depth.
+
+![Probe spectra relative to the reference shedding frequency](figures/local_lh_spectra.png)
+
+![Shedding amplitude and phase error against time](figures/local_lh_phase_tracking.png)
+
+![Wake profiles along the centreline](figures/local_lh_wake_profiles.png)
+
+Read together: within this budget, additional message-passing steps buy a measurable gain in one-step accuracy, most clearly in the pressure, and no measurable gain in long-horizon accuracy or in the wake dynamics: no depth preserves vortex shedding. These results are consistent with insufficient training, but varying depth at one budget cannot establish the cause of the rollout errors. Comparing training budgets at fixed depth would help distinguish optimisation limits from capacity limits.
 
 ### Computational cost
 
@@ -252,7 +277,7 @@ MeshGraphNet from PhysicsNeMo runs on Apple MPS without changes, including the `
 
 ## Verification
 
-An independent audit of the implementation, the data handling, the metrics and the reported claims is in [`docs/SCIENTIFIC_AUDIT.md`](docs/SCIENTIFIC_AUDIT.md), with the comparison against NVIDIA's example in [`docs/UPSTREAM_COMPARISON.md`](docs/UPSTREAM_COMPARISON.md), the rollout checks in [`docs/ROLLOUT_VERIFICATION.md`](docs/ROLLOUT_VERIFICATION.md) and the open experiments in [`docs/EXPERIMENT_GAPS.md`](docs/EXPERIMENT_GAPS.md). The scripts in [`audit/`](audit) reproduce its numbers.
+An independent audit of the implementation, the data handling, the metrics and the reported claims is in [`docs/SCIENTIFIC_AUDIT.md`](docs/SCIENTIFIC_AUDIT.md), with the comparison against NVIDIA's example in [`docs/UPSTREAM_COMPARISON.md`](docs/UPSTREAM_COMPARISON.md), the rollout checks in [`docs/ROLLOUT_VERIFICATION.md`](docs/ROLLOUT_VERIFICATION.md), the nine-run wake diagnostics in [`docs/LONG_HORIZON_DIAGNOSTICS.md`](docs/LONG_HORIZON_DIAGNOSTICS.md) and the open experiments in [`docs/EXPERIMENT_GAPS.md`](docs/EXPERIMENT_GAPS.md). The scripts in [`audit/`](audit) reproduce its numbers.
 
 ## Possible extensions
 
@@ -260,7 +285,6 @@ An independent audit of the implementation, the data handling, the metrics and t
 - Vary the training budget at fixed depth to separate under-training from a capacity limit.
 - Resample the training noise every epoch and measure the effect on rollout stability.
 - Add multi-step (unrolled) training losses and compare the error accumulation.
-- Measure the shedding frequency of predicted and reference wakes from a probe signal in trajectories with a periodic wake.
 
 ## Repository structure
 
@@ -268,11 +292,13 @@ An independent audit of the implementation, the data handling, the metrics and t
 configs/            official.yaml (upstream settings), smoke.yaml, local.yaml, full.yaml
 src/mgn_vortex/     config, data access, model construction, training engine, rollout,
                     metrics, mesh operators, evaluation, study loop, plotting, run metadata
-scripts/            download_data.py, train.py, evaluate.py, plot_results.py, probe.py, results.py
+scripts/            download_data.py, train.py, evaluate.py, plot_results.py, probe.py, results.py,
+                    long_horizon.py and long_horizon_analysis.py (wake and spectral diagnostics)
 tests/              unit and pipeline tests on a synthetic dataset in the upstream file format,
                     and consistency tests of the published results
 audit/              independent checks of the data, the stored metrics and the rollout
-docs/               scientific audit, upstream comparison, rollout verification, experiment gaps
+docs/               scientific audit, upstream comparison, rollout verification, long-horizon
+                    diagnostics, experiment gaps
 kaggle/             run_cuda.ipynb, launcher for a CUDA session
 results/            tracked summaries, metrics, histories and error curves of the studies
 figures/            figures of the README
@@ -306,6 +332,10 @@ python scripts/train.py --config smoke
 python scripts/train.py --config local --resume
 python scripts/results.py publish runs/local
 python scripts/plot_results.py --study results/local --out figures
+
+# wake probes and spectra: repeat the rollouts from the checkpoints (CPU), then analyse
+python scripts/long_horizon.py --config local --threads 3
+python scripts/long_horizon_analysis.py --study results/local
 ```
 
 `scripts/train.py --config <name> [overrides]` trains every (processor size, seed) run of a configuration and evaluates it; arguments after the options are Hydra overrides, for example `study.seeds=[0]` or `device=cpu`. `scripts/evaluate.py --config <name>` repeats the evaluation from the checkpoints.
@@ -340,7 +370,7 @@ python -m pytest -q
 PHYSICSNEMO_UPSTREAM=/path/to/physicsnemo python -m pytest -q   # adds the comparisons with the upstream files
 ```
 
-The tests write a small synthetic dataset in the format of the DeepMind files and need neither the real data nor a GPU. They cover the configurations (upstream values kept, reduced studies change only budget keys), TFRecord counting and partial download, graph construction and features, parameter counts and the forward pass, agreement of MPS with CPU, the metrics and mesh operators on fields with known answers, the rollout (reference reproduction with an oracle, fixed boundary nodes, agreement with NVIDIA's rollout), reproducibility of training for a fixed seed, checkpoint round trips, the study outputs, and the structure of the Kaggle launcher. `tests/test_results.py` recomputes the published aggregates of `results/local` from the stored error curves and checks the quantitative statements of the Results section.
+The tests write a small synthetic dataset in the format of the DeepMind files and need neither the real data nor a GPU. They cover the configurations (upstream values kept, reduced studies change only budget keys), TFRecord counting and partial download, graph construction and features, parameter counts and the forward pass, agreement of MPS with CPU, the metrics and mesh operators on fields with known answers, the rollout (reference reproduction with an oracle, fixed boundary nodes, agreement with NVIDIA's rollout), reproducibility of training for a fixed seed, checkpoint round trips, the study outputs, and the structure of the Kaggle launcher. `tests/test_results.py` recomputes the published aggregates of `results/local` from the stored error curves and checks the quantitative statements of the Results section; `tests/test_diagnostics.py` checks the spectral and phase estimators on signals with known answers, and `tests/test_long_horizon.py` checks the long-horizon results against their tracked inputs.
 
 ## Attribution
 
