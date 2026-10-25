@@ -47,7 +47,7 @@ At this budget the study shows a consistent but small one-step gain with depth, 
 | E24 | CPU-only `torch_scatter` build works on CUDA | correct by reading the code (sum reduction only); not executed on CUDA | UNVERIFIED |
 | E25 | Kaggle launcher and `full` / `official` studies | statically tested only | UNVERIFIED (as the README states) |
 | E26 | Velocity in m/s | the files do not state units | UNVERIFIED (minor) |
-| E27 | Depth does not change the long-horizon dynamics at this budget | 63 metrics x (slope + 3 paired differences): 10 of 252 intervals exclude zero, 5 of them one-step effects; the rest at the chance rate (LONG_HORIZON_DIAGNOSTICS.md section 4) | SUPPORTED BUT LIMITED (3 seeds) |
+| E27 | No detectable depth effect on the long-horizon dynamics at this budget (not evidence of no effect) | 63 metrics x (slope + 3 paired differences): 10 of 252 intervals exclude zero, 5 of them one-step effects; the rest at the chance rate (LONG_HORIZON_DIAGNOSTICS.md section 4) | SUPPORTED BUT LIMITED (3 seeds) |
 | E28 | Pressure-error step near step 327 | reference pressure of test trajectory 7 jumps 12 % in norm between time levels 326 and 327 with smooth velocity; a data feature | VERIFIED |
 
 ## 3. Experimental control
@@ -105,8 +105,9 @@ Supported by the evidence above:
 
 - "Designed and ran a controlled study of message-passing depth (5, 10, 15 layers, 3 seeds each) in NVIDIA PhysicsNeMo's MeshGraphNet on the DeepMind cylinder-flow dataset, at a fixed reduced budget of 11,960 gradient steps per model, with paired seeds, matched data and full provenance."
 - "Built an evaluation of autoregressive rollouts beyond the upstream example: area-weighted relative errors, a persistence baseline, lag-minimised (phase-aligned) error, kinetic-energy and vorticity diagnostics, and a test that matches NVIDIA's rollout to 1e-5."
-- "Found that at this budget depth improves one-step accuracy consistently but does not improve 600-step rollout accuracy; all models fall behind a persistence baseline after about 80 to 100 steps, with error dominated by loss of vortex shedding and energy drift rather than phase error."
+- "Found that at this budget depth improves one-step accuracy consistently but gives no detectable improvement in 600-step rollout accuracy; all models fall behind a persistence baseline after about 80 to 100 steps, with error dominated by loss of vortex shedding and energy drift rather than phase error."
 - "Verified the results independently: aggregates recomputed from per-step curves, and rollouts reproduced from checkpoints on a second backend (CPU vs Apple MPS) to about 1e-7."
+- "Showed with spectral, phase and wake diagnostics of all nine models that none preserves vortex shedding beyond about 100 steps at this budget (shedding amplitude below half the reference by step 53, median), with no detectable effect of depth on any long-horizon quantity."
 
 Not supported, and to be avoided:
 
@@ -114,6 +115,8 @@ Not supported, and to be avoided:
 - Any claim of a statistically significant depth effect, or of an optimal depth.
 - Any statement that NVIDIA's configuration or a CUDA study was run, or that the study is a reproduction of the upstream training.
 - "Shallower models are better for rollouts" (K = 10 is best in the mean and in 2 of 3 seeds, within seed noise).
+- That MeshGraphNet cannot model vortex shedding, that depth is ineffective in general, or that under-training or model capacity is the established cause of the shedding loss.
+- That finite (non-diverging) rollouts are physically accurate.
 
 ## 8. Outstanding scientific work
 
