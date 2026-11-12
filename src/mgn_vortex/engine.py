@@ -268,7 +268,10 @@ def probe_speed(cfg: DictConfig, processor_size: int, run_dir: Path, device: tor
     """Training speed and memory of one model size, measured over ``steps`` gradient steps after ``warmup``."""
     if device.type == "cuda":
         torch.cuda.reset_peak_memory_stats(device)
+    started = time.perf_counter()
     trainer = MGNTrainer(cfg, processor_size, 0, run_dir, device)
+    valid = build_dataset(cfg, "valid", run_dir)
+    data_seconds = time.perf_counter() - started
     count, tick = 0, None
     while count < warmup + steps:
         for graph in trainer.dataloader:
@@ -281,7 +284,13 @@ def probe_speed(cfg: DictConfig, processor_size: int, run_dir: Path, device: tor
                 break
     synchronize(device)
     seconds = time.perf_counter() - tick
+    tick = time.perf_counter()
+    valid_loss = validation_loss(trainer.model, valid, range(0, len(valid), cfg.validation.stride), device)
     return {
+        "data_seconds": data_seconds,
+        "validation_seconds": time.perf_counter() - tick,
+        "validation_loss": valid_loss,
+        "milliseconds_per_step": 1000 * seconds / steps,
         "processor_size": processor_size,
         "parameters": count_parameters(trainer.model),
         "measured_steps": steps,

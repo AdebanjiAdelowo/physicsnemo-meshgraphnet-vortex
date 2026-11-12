@@ -10,8 +10,10 @@ the config is never reduced.
 """
 
 import argparse
-import shutil
+import math
+import tempfile
 import time
+from pathlib import Path
 
 import torch
 from _bootstrap import ROOT
@@ -35,6 +37,7 @@ def main() -> None:
     parser.add_argument("--config", required=True)
     parser.add_argument("--steps", type=int, default=300, help="measured gradient steps per processor size")
     parser.add_argument("--warmup", type=int, default=50)
+    parser.add_argument("--matched-data", action="store_true", help="benchmark the configured train and validation splits")
     parser.add_argument("--budget-hours", type=float, default=None)
     parser.add_argument("overrides", nargs="*")
     args = parser.parse_args()
@@ -42,8 +45,13 @@ def main() -> None:
     cfg = load_config(args.config, args.overrides)
     check_data(cfg)
     device = resolve_device(cfg.device)
-    out_dir = ROOT / "runs" / f"{cfg.name}_probe"
-    small = OmegaConf.merge(cfg, {"num_training_samples": PROBE_TRAJECTORIES, "num_test_samples": 1})
+    if args.steps < 1 or args.warmup < 0:
+        parser.error("--steps must be positive and --warmup nonnegative")
+    scratch = tempfile.TemporaryDirectory(prefix="mgn-probe-")
+    out_dir = Path(scratch.name)
+    small = OmegaConf.merge(cfg, {"num_test_samples": 1})
+    if not args.matched_data:
+        small.num_training_samples = min(cfg.num_training_samples, PROBE_TRAJECTORIES)
 
     sizes = [int(k) for k in cfg.study.processor_sizes]
     n_seeds = len(cfg.study.seeds)
@@ -53,13 +61,17 @@ def main() -> None:
         run_dir = out_dir / engine.run_name(size, 0)
         row = engine.probe_speed(small, size, run_dir, device, args.steps, args.warmup)
         # rollout speed with an untrained model of the same size
+        tick = time.perf_counter()
         dataset = build_dataset(small, "test", run_dir)
+        row["test_data_seconds_one_trajectory"] = time.perf_counter() - tick
         model = build_model(cfg, size).to(device).eval()
         engine.synchronize(device)
         tick = time.perf_counter()
         rollout(model, dataset, 0, device)
         engine.synchronize(device)
         row["rollout_seconds_per_trajectory"] = time.perf_counter() - tick
+        if not all(math.isfinite(row[k]) for k in ("validation_loss", "steps_per_second", "rollout_seconds_per_trajectory")):
+            raise RuntimeError(f"Nonfinite probe result for K={size}")
         row["projected_train_hours_per_run"] = SAFETY_FACTOR * steps / row["steps_per_second"] / 3600
         # per test trajectory: one rollout and one strided one-step pass, plus the metrics on the CPU
         row["projected_eval_hours_per_run"] = (
@@ -74,12 +86,13 @@ def main() -> None:
             f"{row['projected_train_hours_per_run'] * 60:.0f} min per training run of {steps:,} steps",
             flush=True,
         )
-    shutil.rmtree(out_dir, ignore_errors=True)
+    scratch.cleanup()
 
     per_seed = (train_hours + eval_hours) / n_seeds
     total = train_hours + eval_hours
     result = {
         "config": cfg.name,
+        "benchmark_config": OmegaConf.to_container(small, resolve=True),
         "environment": collect_metadata(device),
         "steps_per_run": steps,
         "runs": len(sizes) * n_seeds,
