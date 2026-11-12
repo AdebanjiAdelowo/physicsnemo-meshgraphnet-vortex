@@ -50,7 +50,8 @@ separate immutable model snapshots under `steps_*/mp10_seed*/`. Training states
 store the model, optimiser, scheduler, AMP scaler, RNG state, data-loader generator
 state and loss history. The state is written atomically. An interrupted invocation
 reconstructs the same shuffled epoch and consumes its already completed prefix
-before the next update. SHA-256 hashes of the actual dataset files are verified on
+before the next update. CUDA reduction kernels can introduce numerical variation
+across otherwise equivalent executions. SHA-256 hashes of the actual dataset files are verified on
 resume. Reuse the same Git SHA, device class, package versions and configuration.
 
 For Kaggle resumption, attach the trusted prior notebook version's saved outputs and
@@ -82,7 +83,8 @@ frequency must lie in the reference band and predicted band power must reach
 For the seed-0 comparison, report both endpoints on the same 50 trajectories and
 separate gains in one-step error from changes in the shedding-preservation rate,
 time to amplitude loss, extrapolation-window velocity error and step-599 energy
-ratio. Treat any single-seed comparison as descriptive. Use seed-paired comparisons
+ratio. The evaluation command writes a per-seed comparison JSON with the endpoint
+metrics and differences from the 11,960-step baseline when available. Treat any single-seed comparison as descriptive. Use seed-paired comparisons
 for replication, with trajectories nested within seed.
 
 ## Evidence

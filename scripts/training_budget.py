@@ -102,8 +102,8 @@ def compare_seed(output, cutoffs, seed, processor_size):
         endpoints[cutoff] = {
             "one_step_velocity_increment": ev["one_step"]["window"]["rel_l2_velocity_increment"],
             "one_step_pressure": ev["one_step"]["window"]["rel_l2_pressure"],
-            "velocity_extrapolation_mean": float(np.mean([row["E_u_mean_extrapolation"] for row in wakes])),
-            "energy_ratio_step_599": float(np.mean([row["KE_ratio_h599"] for row in wakes])),
+            "velocity_extrapolation_mean": float(np.asarray([row["E_u_mean_extrapolation"] for row in wakes], dtype=float).mean()),
+            "energy_ratio_step_599": float(np.asarray([row["KE_ratio_h599"] for row in wakes], dtype=float).mean()),
             "shedding_preserved_extrapolation_fraction": (
                 ev["shedding_preserved_counts"]["extrapolation"] / len(shedding) if shedding else None
             ),
