@@ -84,3 +84,19 @@ def test_notebook_numbers_match_the_configs():
     assert f"{steps_per_run(official):,} gradient steps" in text
     assert f"{len(full.study.processor_sizes) * len(full.study.seeds)} runs" in text
     assert f"{full.num_test_time_steps - 1}-step rollout" in text
+
+
+def test_training_budget_notebook_defaults_to_single_gpu_verification():
+    nb = json.loads(NOTEBOOK.with_name("training_budget.ipynb").read_text())
+    code = []
+    for cell in nb["cells"]:
+        if cell["cell_type"] == "code":
+            assert not cell["outputs"]
+            code.append("".join(cell["source"]))
+            ast.parse(code[-1])
+    text = "\n".join(code)
+    assert 'STAGE = "probe"' in text
+    assert 'os.environ["CUDA_VISIBLE_DEVICES"] = "0"' in text
+    assert text.index("--config smoke") < text.index("--config training_budget --matched-data")
+    assert text.index("--config training_budget --matched-data") < text.index('if STAGE != "probe":')
+    assert 'cutoffs = (119600, 11960) if STAGE == "seed0"' in text

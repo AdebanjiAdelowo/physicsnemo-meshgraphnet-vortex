@@ -80,7 +80,7 @@ def _stats(values: np.ndarray) -> dict:
     return {"mean": float(finite.mean()), "median": float(np.median(finite)), "max": float(finite.max()), "n_finite": int(finite.size)}
 
 
-def evaluate_run(cfg: DictConfig, processor_size: int, run_dir: Path, device: torch.device, field_trajectory: int | None = None):
+def evaluate_run(cfg: DictConfig, processor_size: int, run_dir: Path, device: torch.device, field_trajectory: int | None = None, *, on_rollout=None):
     """Evaluate one trained run on the test trajectories.
 
     Returns ``(metrics, curves, fields)``: scalar metrics for ``eval_metrics.json``, per-trajectory
@@ -102,6 +102,8 @@ def evaluate_run(cfg: DictConfig, processor_size: int, run_dir: Path, device: to
         result = rollout(model, dataset, traj, device, autoregressive=True)
         synchronize(device)
         rollout_seconds += time.perf_counter() - tick
+        if on_rollout is not None:
+            on_rollout(traj, result, dataset)
         series = trajectory_metrics(result, cfg.rollout.max_lag)
         for name in CURVES:
             curves[name].append(series[name])
