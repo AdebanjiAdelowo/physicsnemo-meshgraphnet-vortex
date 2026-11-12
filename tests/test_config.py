@@ -102,4 +102,14 @@ def test_overrides():
 
 
 def test_config_files_present():
-    assert {p.stem for p in CONFIG_DIR.glob("*.yaml")} == {"official", "smoke", "local", "full"}
+    assert {p.stem for p in CONFIG_DIR.glob("*.yaml")} == {"official", "smoke", "local", "full", "training_budget"}
+
+
+def test_training_budget_matches_full_data_and_schedule():
+    cfg, full = load_config("training_budget"), load_config("full")
+    for key in ("num_training_samples", "num_test_samples", "num_training_time_steps",
+                "num_test_time_steps", "validation", "rollout", "lr", "lr_decay_rate", "batch_size"):
+        assert cfg[key] == full[key]
+    assert list(cfg.study.processor_sizes) == [10]
+    assert list(cfg.study.seeds) == [0, 1, 2]
+    assert list(cfg.budget.cutoffs) == [11960, 59800, steps_per_run(cfg)] == [11960, 59800, 119600]

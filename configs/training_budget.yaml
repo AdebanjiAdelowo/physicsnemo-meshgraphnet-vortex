@@ -1,0 +1,17 @@
+# One training trajectory per seed, evaluated at three optimiser-step cutoffs.
+defaults:
+  - full
+  - _self_
+
+name: training_budget
+device: cuda:0
+processor_size: 10
+log_every: 1196
+
+study:
+  processor_sizes: [10]
+  seeds: [0, 1, 2]
+
+budget:
+  cutoffs: [11960, 59800, 119600]
+  checkpoint_every: 5980
