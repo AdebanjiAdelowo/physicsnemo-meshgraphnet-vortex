@@ -15,6 +15,7 @@ import tempfile
 import time
 from pathlib import Path
 
+import numpy as np
 import torch
 from _bootstrap import ROOT
 from omegaconf import OmegaConf
@@ -67,9 +68,11 @@ def main() -> None:
         model = build_model(cfg, size).to(device).eval()
         engine.synchronize(device)
         tick = time.perf_counter()
-        rollout(model, dataset, 0, device)
+        prediction = rollout(model, dataset, 0, device)
         engine.synchronize(device)
         row["rollout_seconds_per_trajectory"] = time.perf_counter() - tick
+        if not np.isfinite(prediction["pred"]).all():
+            raise RuntimeError(f"Nonfinite probe rollout for K={size}")
         if not all(math.isfinite(row[k]) for k in ("validation_loss", "steps_per_second", "rollout_seconds_per_trajectory")):
             raise RuntimeError(f"Nonfinite probe result for K={size}")
         row["projected_train_hours_per_run"] = SAFETY_FACTOR * steps / row["steps_per_second"] / 3600

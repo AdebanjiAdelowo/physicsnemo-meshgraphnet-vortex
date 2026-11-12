@@ -259,8 +259,12 @@ def load_trained_model(cfg: DictConfig, processor_size: int, run_dir: Path, devi
     """The model of a finished run, from its last checkpoint, in evaluation mode."""
     model = build_model(cfg, processor_size).to(device)
     model.eval()
-    with working_directory(run_dir):
-        load_checkpoint(cfg.ckpt_path, models=model, device=device)
+    snapshot = run_dir / "budget_weights.pt"
+    if snapshot.is_file():
+        model.load_state_dict(torch.load(snapshot, map_location=device, weights_only=True))
+    else:
+        with working_directory(run_dir):
+            load_checkpoint(cfg.ckpt_path, models=model, device=device)
     return model
 
 
@@ -272,18 +276,22 @@ def probe_speed(cfg: DictConfig, processor_size: int, run_dir: Path, device: tor
     trainer = MGNTrainer(cfg, processor_size, 0, run_dir, device)
     valid = build_dataset(cfg, "valid", run_dir)
     data_seconds = time.perf_counter() - started
+    initial = next(trainer.model.parameters()).detach().clone()
     count, tick = 0, None
     while count < warmup + steps:
         for graph in trainer.dataloader:
             if count == warmup:
                 synchronize(device)
                 tick = time.perf_counter()
-            trainer.train(graph)
+            loss = trainer.train(graph)
             count += 1
             if count == warmup + steps:
                 break
     synchronize(device)
     seconds = time.perf_counter() - tick
+    updated = next(trainer.model.parameters()).detach()
+    if not bool(loss.isfinite()) or not bool(updated.isfinite().all()) or torch.equal(initial, updated):
+        raise RuntimeError("Probe did not produce a finite optimizer update")
     tick = time.perf_counter()
     valid_loss = validation_loss(trainer.model, valid, range(0, len(valid), cfg.validation.stride), device)
     return {

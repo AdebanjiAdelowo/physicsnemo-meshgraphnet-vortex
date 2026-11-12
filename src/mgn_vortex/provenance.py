@@ -65,7 +65,7 @@ def collect_metadata(device: torch.device) -> dict:
         "gpu_memory_gb": round(torch.cuda.get_device_properties(device).total_memory / 2**30, 2) if cuda else None,
         "cuda_version": torch.version.cuda if cuda else None,
         "python_version": sys.version.split()[0],
-        "torch_version": torch.__version__,
+        "torch_version": str(torch.__version__),
         "physicsnemo": physicsnemo_source(),
         "torch_geometric_version": _version("torch_geometric"),
         "torch_scatter_version": _version("torch_scatter"),
