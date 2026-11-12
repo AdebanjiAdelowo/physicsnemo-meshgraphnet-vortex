@@ -1,4 +1,5 @@
 import json
+import sys
 
 import pytest
 import torch
@@ -8,10 +9,15 @@ from mgn_vortex.budget import matched_data, train_budget
 from mgn_vortex.config import steps_per_run
 
 
-def test_resume_matches_uninterrupted_training(cfg, tmp_path):
+@pytest.mark.parametrize("workers", [
+    0,
+    pytest.param(2, marks=pytest.mark.skipif(sys.platform != "linux", reason="Kaggle Linux worker start method")),
+])
+def test_resume_matches_uninterrupted_training(cfg, tmp_path, workers):
     with open_dict(cfg):
         cfg = OmegaConf.merge(cfg, {
             "epochs": 2,
+            "num_dataloader_workers": workers,
             "processor_size": 2,
             "budget": {"cutoffs": [11, 33, 66], "checkpoint_every": 9},
         })
