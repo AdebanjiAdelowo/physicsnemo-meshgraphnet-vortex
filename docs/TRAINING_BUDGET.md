@@ -23,8 +23,9 @@ decay that accompanies them. It does not isolate the effect of changing the sche
 ## CUDA verification and costs
 
 Use the [Kaggle notebook](../kaggle/training_budget.ipynb) with Internet access and a
-T4 accelerator. It checks out a full Git SHA, installs the pinned PhysicsNeMo
-revision, verifies PyTorch, PyG and CUDA sum aggregation through torch_scatter,
+T4 accelerator. It checks out a full Git SHA and installs the pinned PhysicsNeMo
+revision in a virtual environment that excludes the base image’s optional RAPIDS
+packages. It verifies PyTorch, PyG and CUDA sum aggregation through torch_scatter,
 runs the tests and the existing CUDA smoke experiment, then times K=10 on one visible
 GPU. The CPU-only torch_scatter build uses PyTorch's CUDA scatter-add for sum. The
 probe reports synchronised throughput after 50 warm-up steps, over 300 measured
