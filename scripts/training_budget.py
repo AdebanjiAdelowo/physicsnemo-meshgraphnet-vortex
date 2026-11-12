@@ -1,6 +1,7 @@
 """Train and evaluate K=10 cutoffs of a matched-data trajectory for one seed."""
 
 import argparse
+import hashlib
 import json
 import os
 import tempfile
@@ -20,7 +21,12 @@ from mgn_vortex.provenance import collect_metadata, resolve_device, write_json
 
 def evaluate_snapshot(cfg, run_dir, device, dataset_record):
     target = run_dir / "evaluation"
+    with (run_dir / "budget_weights.pt").open("rb") as weights:
+        checksum = hashlib.file_digest(weights, "sha256").hexdigest()
     if target.exists():
+        prior = json.loads((target / "eval_metrics.json").read_text())
+        if prior["checkpoint_sha256"] != checksum:
+            raise ValueError("Evaluation checkpoint hash differs")
         print(f"{target}: evaluation already exists", flush=True)
         return
     provenance = json.loads((run_dir / "training_provenance.json").read_text())
@@ -64,6 +70,7 @@ def evaluate_snapshot(cfg, run_dir, device, dataset_record):
         window: sum(row.get(f"shedding_preserved_{window}", 0) for row in per_trajectory)
         for window in diagnostics.SPECTRAL_WINDOWS
     }
+    metrics["checkpoint_sha256"] = checksum
     metrics["evaluation_seconds"] = time.perf_counter() - started
     metrics["peak_evaluation_memory_mb"] = torch.cuda.max_memory_allocated(device) / 2**20 if device.type == "cuda" else None
     metrics["environment"] = collect_metadata(device)
@@ -80,6 +87,47 @@ def evaluate_snapshot(cfg, run_dir, device, dataset_record):
                             **{f"ref_{key}": value for key, value in ref.items()})
         staged.rename(target)
     print(f"Evaluated {target}", flush=True)
+
+
+def compare_seed(output, cutoffs, seed, processor_size):
+    endpoints = {}
+    for cutoff in cutoffs:
+        folder = output / f"steps_{cutoff:06d}" / engine.run_name(processor_size, seed) / "evaluation"
+        if not folder.is_dir():
+            continue
+        ev = json.loads((folder / "eval_metrics.json").read_text())
+        wakes = json.loads((folder / "wake_metrics.json").read_text())
+        shedding = [row for row in wakes if row["shedding_reference"]]
+        loss_times = [row["t_envelope<0.5"] for row in shedding if row.get("t_envelope<0.5") is not None]
+        endpoints[cutoff] = {
+            "one_step_velocity_increment": ev["one_step"]["window"]["rel_l2_velocity_increment"],
+            "one_step_pressure": ev["one_step"]["window"]["rel_l2_pressure"],
+            "velocity_extrapolation_mean": float(np.mean([row["E_u_mean_extrapolation"] for row in wakes])),
+            "energy_ratio_step_599": float(np.mean([row["KE_ratio_h599"] for row in wakes])),
+            "shedding_preserved_extrapolation_fraction": (
+                ev["shedding_preserved_counts"]["extrapolation"] / len(shedding) if shedding else None
+            ),
+            "shedding_reference_count": len(shedding),
+            "amplitude_loss_median_step_censored_at_600": float(np.median(loss_times)) if loss_times else None,
+            "amplitude_loss_trajectory_count": len(loss_times),
+            "nonfinite_trajectories": ev["trajectories_with_nonfinite_error"],
+            "rollout_horizons": ev["rollout_horizons"],
+        }
+    if not endpoints:
+        return
+    base = endpoints.get(cutoffs[0])
+    differences = {}
+    if base is not None:
+        for cutoff, endpoint in endpoints.items():
+            if cutoff != cutoffs[0]:
+                differences[cutoff] = {
+                    key: value - base[key] for key, value in endpoint.items()
+                    if isinstance(value, float) and isinstance(base[key], float)
+                }
+    write_json(output / f"seed{seed}_comparison.json", to_json({
+        "seed": seed, "processor_size": processor_size, "by_cutoff": endpoints,
+        "differences_from_baseline": differences,
+    }))
 
 
 def main():
@@ -109,6 +157,7 @@ def main():
     else:
         run_dir = args.output / f"steps_{args.cutoff:06d}" / engine.run_name(cfg.processor_size, args.seed)
         evaluate_snapshot(cfg, run_dir, device, dataset)
+        compare_seed(args.output, list(cfg.budget.cutoffs), args.seed, cfg.processor_size)
 
 
 if __name__ == "__main__":
