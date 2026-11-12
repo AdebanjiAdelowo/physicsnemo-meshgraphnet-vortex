@@ -60,3 +60,14 @@ def test_dataset_manifest_hash_mismatch(cfg, tmp_path):
     cfg.data_dir = str(root)
     with pytest.raises(ValueError, match="Dataset hash mismatch"):
         matched_data(cfg)
+
+
+def test_indexed_cuda_peak_memory_initializes_allocator_first(monkeypatch):
+    from mgn_vortex.engine import reset_peak_memory
+
+    calls = []
+    monkeypatch.setattr(torch.cuda, "init", lambda: calls.append("init"))
+    monkeypatch.setattr(torch.cuda, "reset_peak_memory_stats", calls.append)
+    device = torch.device("cuda:0")
+    reset_peak_memory(device)
+    assert calls == ["init", device]

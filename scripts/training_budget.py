@@ -44,8 +44,7 @@ def evaluate_snapshot(cfg, run_dir, device, dataset_record):
         wakes.append(wake_series(result, geo))
 
     started = time.perf_counter()
-    if device.type == "cuda":
-        torch.cuda.reset_peak_memory_stats(device)
+    engine.reset_peak_memory(device)
     metrics, curves, _ = evaluation.evaluate_run(
         cfg, cfg.processor_size, run_dir, device, on_rollout=collect_wake,
     )

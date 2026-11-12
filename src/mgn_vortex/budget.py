@@ -118,8 +118,7 @@ def _train_locked(cfg, root, seed, device, dataset, target, deadline, source):
         if saved["step"] >= target:
             return saved["step"]
 
-    if device.type == "cuda":
-        torch.cuda.reset_peak_memory_stats(device)
+    engine.reset_peak_memory(device)
     trainer = engine.MGNTrainer(cfg, cfg.processor_size, seed, source, device)
     valid = build_dataset(cfg, "valid", source)
     data_seconds = time.perf_counter() - started

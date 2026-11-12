@@ -62,6 +62,13 @@ def synchronize(device: torch.device) -> None:
         torch.mps.synchronize()
 
 
+def reset_peak_memory(device: torch.device) -> None:
+    if device.type == "cuda":
+        # Indexed devices can reach the allocator before CUDA's lazy initialisation.
+        torch.cuda.init()
+        torch.cuda.reset_peak_memory_stats(device)
+
+
 class MGNTrainer:
     def __init__(self, cfg: DictConfig, processor_size: int, seed: int, run_dir: Path, device: torch.device):
         self.device = device
@@ -158,8 +165,7 @@ def train_run(cfg: DictConfig, processor_size: int, seed: int, run_dir: Path, de
     ckpt_dir = run_dir / cfg.ckpt_path
     if ckpt_dir.exists():
         shutil.rmtree(ckpt_dir)
-    if device.type == "cuda":
-        torch.cuda.reset_peak_memory_stats(device)
+    reset_peak_memory(device)
 
     start = time.perf_counter()
     trainer = MGNTrainer(cfg, processor_size, seed, run_dir, device)
@@ -270,8 +276,7 @@ def load_trained_model(cfg: DictConfig, processor_size: int, run_dir: Path, devi
 
 def probe_speed(cfg: DictConfig, processor_size: int, run_dir: Path, device: torch.device, steps: int, warmup: int) -> dict:
     """Training speed and memory of one model size, measured over ``steps`` gradient steps after ``warmup``."""
-    if device.type == "cuda":
-        torch.cuda.reset_peak_memory_stats(device)
+    reset_peak_memory(device)
     started = time.perf_counter()
     trainer = MGNTrainer(cfg, processor_size, 0, run_dir, device)
     valid = build_dataset(cfg, "valid", run_dir)
