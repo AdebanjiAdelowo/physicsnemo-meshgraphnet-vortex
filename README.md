@@ -10,6 +10,17 @@ The reported experiment compares nine models: three processor depths and three s
 
 The repository also provides a 38-step pipeline check (`configs/smoke.yaml`), a single-GPU study with 119,600 gradient steps per model (`configs/full.yaml`), and NVIDIA's settings with 2,990,000 sample presentations (`configs/official.yaml`). CUDA throughput and accuracy have not been measured.
 
+### Matched training budgets
+
+The [training-budget protocol](docs/TRAINING_BUDGET.md) tests whether additional
+optimiser updates improve wake fidelity at fixed depth $K=10$ and latent width 128.
+For each seed, checkpoints at 11,960, 59,800 and 119,600 updates share the same
+200 training trajectories, learning-rate schedule and shuffled training sequence.
+The comparison uses 50 test trajectories, 599-step rollouts, a velocity persistence
+baseline and the established frequency and amplitude criteria for vortex shedding.
+The [Kaggle notebook](kaggle/training_budget.ipynb) measures single-T4 throughput and
+runs the matched comparison.
+
 ## Physical problem
 
 A viscous incompressible fluid flows through a plane channel past a circular cylinder. The velocity $\mathbf{u} = (u, v)$ and pressure $p$ satisfy the Navier–Stokes equations

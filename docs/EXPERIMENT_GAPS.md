@@ -1,5 +1,7 @@
 # Experiment gaps and CUDA plan
 
+The fixed-depth study for gap G1 is specified in the [training-budget protocol](TRAINING_BUDGET.md).
+
 What the reported `local` study cannot answer, and the experiments that would answer it, ordered by expected value per GPU hour. Nothing here has been run. All CUDA throughput figures are projections from the Apple MPS probe (`results/local/probe.json`) and must be replaced by `scripts/probe.py` on the target GPU before a study is started.
 
 ## 1. Open scientific questions
