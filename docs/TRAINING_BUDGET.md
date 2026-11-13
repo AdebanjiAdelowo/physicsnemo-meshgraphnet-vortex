@@ -137,6 +137,8 @@ intermediate training checkpoint has validation MSE 0.0762.
 | Shedding preserved, steps 100–299 | 0/36 | 25/36 |
 | Shedding preserved, steps 300–599 | 0/36 | 19/36 |
 
+![Seed-0 relative velocity error and persistence](../figures/training_budget_seed0_velocity.png)
+
 Mean errors over the 50 trajectories. Each paired entry is baseline / extended.
 
 | Step | Relative velocity | Relative pressure | Relative vorticity | Relative energy error | Velocity persistence |
