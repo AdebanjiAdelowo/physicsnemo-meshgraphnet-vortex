@@ -1,0 +1,140 @@
+{
+  "config": "training_budget",
+  "benchmark_config": {
+    "data_dir": "data/cylinder_flow",
+    "batch_size": 1,
+    "epochs": 2,
+    "num_training_samples": 200,
+    "num_training_time_steps": 300,
+    "lr": 0.0001,
+    "lr_decay_rate": 0.9999991,
+    "num_input_features": 6,
+    "num_output_features": 3,
+    "num_edge_features": 3,
+    "amp": false,
+    "jit": false,
+    "num_dataloader_workers": 2,
+    "do_concat_trick": false,
+    "num_processor_checkpoint_segments": 0,
+    "recompute_activation": false,
+    "wandb_mode": "disabled",
+    "watch_model": false,
+    "ckpt_path": "./checkpoints",
+    "num_test_samples": 1,
+    "num_test_time_steps": 600,
+    "viz_vars": [
+      "u",
+      "v",
+      "p"
+    ],
+    "frame_skip": 10,
+    "frame_interval": 1,
+    "name": "training_budget",
+    "output_dir": "runs/training_budget",
+    "device": "cuda:0",
+    "processor_size": 10,
+    "log_every": 1196,
+    "validation": {
+      "num_samples": 10,
+      "stride": 10,
+      "per_epoch": 5
+    },
+    "rollout": {
+      "horizons": [
+        1,
+        10,
+        50,
+        100,
+        200,
+        299,
+        450,
+        599
+      ],
+      "max_lag": 40,
+      "one_step_stride": 5,
+      "field_times": [
+        50,
+        150,
+        299,
+        599
+      ]
+    },
+    "study": {
+      "processor_sizes": [
+        10
+      ],
+      "seeds": [
+        0,
+        1,
+        2
+      ]
+    },
+    "budget": {
+      "cutoffs": [
+        11960,
+        59800,
+        119600
+      ],
+      "checkpoint_every": 5980
+    }
+  },
+  "environment": {
+    "timestamp_utc": "2026-11-12T20:42:33+00:00",
+    "git_commit": "25cbdf0604e55f21729e7719fe8dd009f217bce7",
+    "git_dirty": false,
+    "device": "cuda:0",
+    "gpu_name": "Tesla T4",
+    "gpu_memory_gb": 14.56,
+    "cuda_version": "13.2",
+    "python_version": "3.13.16",
+    "torch_version": "2.15.0+cu132",
+    "physicsnemo": {
+      "version": "2.3.0a0",
+      "commit": "b45a5c810c741e6b41f8515be24c51121f8fc21f",
+      "url": "https://github.com/NVIDIA/physicsnemo.git",
+      "example": "examples/cfd/vortex_shedding_mgn"
+    },
+    "torch_geometric_version": "2.8.1",
+    "torch_scatter_version": "2.1.2",
+    "tfrecord_version": "1.14.7",
+    "numpy_version": "2.5.4",
+    "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "torch_threads": 2
+  },
+  "steps_per_run": 119600,
+  "runs": 3,
+  "safety_factor": 1.15,
+  "per_processor_size": [
+    {
+      "data_seconds": 17.623983033999934,
+      "validation_seconds": 4.085538866999968,
+      "validation_loss": 0.45375729564041595,
+      "milliseconds_per_step": 37.442207359999884,
+      "processor_size": 10,
+      "parameters": 1588739,
+      "measured_steps": 300,
+      "steps_per_second": 26.707827088963676,
+      "peak_train_memory_mb": 468.759765625,
+      "test_data_seconds_one_trajectory": 0.14093995799998993,
+      "rollout_seconds_per_trajectory": 9.133141378999994,
+      "projected_train_hours_per_run": 1.4305003334151067,
+      "projected_eval_hours_per_run": 0.22832853447499984
+    }
+  ],
+  "projected_hours_per_seed": 1.6588288678901069,
+  "projected_hours_total": 4.97648660367032,
+  "budget_hours": null,
+  "fits": null,
+  "complete_seeds_within_budget": null,
+  "notebook_version": "adebanjiadelowo/mgn-vortex-budget-t4-seed-0/4",
+  "gradient_hours_by_cutoff": {
+    "11960": 0.12439133334044405,
+    "59800": 0.6219566667022203,
+    "119600": 1.2439133334044405
+  },
+  "projected_training_hours_extended": 1.4305003334151067,
+  "projected_hours_seed0_comparison": 1.8871574023651063,
+  "projected_hours_extended_seed": 2.1154859368401064,
+  "projected_hours_three_seed_study": 6.346457810520319
+}

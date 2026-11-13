@@ -8,7 +8,7 @@ A parameter study built on the MeshGraphNet vortex-shedding example of [NVIDIA P
 
 The reported experiment compares nine models: three processor depths and three seeds, each trained for 11,960 gradient steps on Apple MPS. This fixed-budget reduced study uses 0.4 % of the sample presentations in NVIDIA's configuration. All figures and metrics below describe this experiment.
 
-The repository also provides a 38-step pipeline check (`configs/smoke.yaml`), a single-GPU study with 119,600 gradient steps per model (`configs/full.yaml`), and NVIDIA's settings with 2,990,000 sample presentations (`configs/official.yaml`). CUDA throughput and accuracy have not been measured.
+The repository also provides a 38-step pipeline check (`configs/smoke.yaml`), a single-GPU study with 119,600 gradient steps per model (`configs/full.yaml`), and NVIDIA's settings with 2,990,000 sample presentations (`configs/official.yaml`).
 
 ### Matched training budgets
 
@@ -19,7 +19,13 @@ For each seed, checkpoints at 11,960, 59,800 and 119,600 updates share the same
 The comparison uses 50 test trajectories, 599-step rollouts, a velocity persistence
 baseline and the established frequency and amplitude criteria for vortex shedding.
 The [Kaggle notebook](kaggle/training_budget.ipynb) measures single-T4 throughput and
-runs the matched comparison.
+runs the matched comparison. On one Tesla T4, the $K=10$ probe measured 26.71
+gradient steps per second. For seed 0, extending training from 11,960 to 119,600
+updates reduced mean relative velocity error over rollout steps 300–599 from
+1.712 to 0.366. In that window, 19 of 36 reference shedding trajectories met
+the frequency and amplitude criteria at the extended cutoff, compared with
+0 of 36 at the baseline. The extended model's mean step-599 velocity error
+was 0.449, compared with 0.412 for persistence.
 
 ## Physical problem
 
@@ -363,7 +369,7 @@ It exits with code 3 if the projection exceeds the budget and never changes the 
 
 `kaggle/run_cuda.ipynb` checks out one commit by its full SHA, verifies `HEAD` and a clean tree, prints the GPU and all package versions, runs the tests, downloads 200, 10 and 50 trajectories (3.5 GB), runs the smoke study on CUDA and then the probe. The study starts only if `RUN_FULL = True` and the projection fits the remaining session budget; otherwise the notebook stops and reports the numbers without reducing epochs, seeds, data or model sizes. `RUN_OFFICIAL` controls NVIDIA's configuration separately and is off by default.
 
-Kaggle runtime has not been measured. Apple MPS timings do not establish T4 or P100 throughput. The launcher measures throughput and memory on the assigned GPU, projects the complete study duration, and checks the session budget before training.
+The separate fixed-depth study reports [measured single-T4 costs](docs/TRAINING_BUDGET.md#single-t4-benchmark). The launcher measures throughput and memory on the assigned GPU, projects the complete study duration, and checks the session budget before training.
 
 After a CUDA run, the downloaded archive is integrated with
 
