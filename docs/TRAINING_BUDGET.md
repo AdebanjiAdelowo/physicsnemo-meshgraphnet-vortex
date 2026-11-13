@@ -159,3 +159,78 @@ The [numerical outputs](../results/training_budget/) include per-trajectory
 frequency and amplitude diagnostics, rollout curves, training histories,
 dataset hashes and checkpoint checksums. The weights and training states
 are available in the [Kaggle notebook output](https://www.kaggle.com/code/adebanjiadelowo/mgn-vortex-budget-t4-seed-0/output).
+
+
+### Two-seed comparison
+
+The follow-up evaluated the saved seed-0 intermediate checkpoint and trained
+and evaluated all three seed-1 checkpoints. Both seeds used the same dataset
+manifest. Each triplet is ordered 11,960 / 59,800 / 119,600 updates.
+
+| Metric | Seed 0 | Seed 1 |
+|---|---:|---:|
+| One-step relative velocity-increment error | 0.480 / 0.341 / 0.291 | 0.581 / 0.326 / 0.302 |
+| One-step relative pressure error | 0.571 / 0.523 / 0.251 | 0.610 / 0.338 / 0.258 |
+| Mean relative velocity error, steps 300–599 | 1.712 / 0.211 / 0.366 | 1.537 / 0.427 / 0.232 |
+| Mean predicted/reference kinetic energy, step 599 | 11.468 / 0.996 / 0.685 | 8.777 / 1.989 / 0.709 |
+| Shedding preserved, steps 300–599 | 0 / 10 / 19 of 36 | 0 / 13 / 3 of 36 |
+| Median step when amplitude fell below half, censored at 600 | 76 / 96.5 / 362 | 95 / 143.5 / 76 |
+
+Both larger budgets improved one-step and late-rollout accuracy relative to
+the baseline in both seeds. Increasing the budget from 59,800 to 119,600
+improved one-step accuracy in both seeds, but its effect on late-rollout
+error and shedding preservation depended on the seed. Both extended
+checkpoints showed a mean kinetic-energy deficit at step 599.
+
+At step 599, the intermediate seed-0 model and extended seed-1 model
+had mean velocity errors of 0.245 and 0.262, below the persistence error
+of 0.412. The other four checkpoints exceeded persistence at that step.
+Seed 1 took 81.17 minutes to train, and its evaluations took 12.29–12.43
+minutes each. The follow-up T4 probe measured 26.80 steps/s and 468.76 MiB
+peak allocated training memory.
+
+All 300 evaluated rollouts remained finite. The two seed trajectories give
+a descriptive comparison. Kaggle reported 0.99 GPU hours after the
+follow-up, below its 2.10-hour projection for the third seed with three
+evaluations, excluding setup. Seed 2 remains to be evaluated.
+
+![Seed-1 relative velocity error and persistence](../figures/training_budget_seed1_velocity.png)
+
+See the [follow-up notebook outputs](https://www.kaggle.com/code/adebanjiadelowo/mgn-vortex-budget-t4-followup/output).
+
+### Rollout errors by horizon
+
+Means over 50 trajectories. Persistence is the relative velocity error of the fixed initial state.
+
+| Seed | Updates | Step | Velocity | Pressure | Vorticity | Energy | Persistence |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 11,960 | 1 | 0.021 | 0.666 | 0.128 | 0.014 | 0.052 |
+| 0 | 11,960 | 10 | 0.073 | 0.483 | 0.227 | 0.040 | 0.182 |
+| 0 | 11,960 | 100 | 0.317 | 1.092 | 0.519 | 0.217 | 0.384 |
+| 0 | 11,960 | 299 | 1.099 | 3.561 | 1.165 | 2.882 | 0.411 |
+| 0 | 11,960 | 599 | 2.257 | 6.155 | 2.340 | 10.565 | 0.412 |
+| 0 | 59,800 | 1 | 0.011 | 0.352 | 0.045 | 0.003 | 0.052 |
+| 0 | 59,800 | 10 | 0.030 | 0.385 | 0.079 | 0.009 | 0.182 |
+| 0 | 59,800 | 100 | 0.105 | 0.676 | 0.214 | 0.049 | 0.384 |
+| 0 | 59,800 | 299 | 0.180 | 0.617 | 0.318 | 0.154 | 0.411 |
+| 0 | 59,800 | 599 | 0.245 | 0.652 | 0.418 | 0.253 | 0.412 |
+| 0 | 119,600 | 1 | 0.012 | 0.361 | 0.064 | 0.003 | 0.052 |
+| 0 | 119,600 | 10 | 0.029 | 0.287 | 0.078 | 0.016 | 0.182 |
+| 0 | 119,600 | 100 | 0.121 | 0.331 | 0.182 | 0.160 | 0.384 |
+| 0 | 119,600 | 299 | 0.277 | 0.522 | 0.398 | 0.289 | 0.411 |
+| 0 | 119,600 | 599 | 0.449 | 0.990 | 0.608 | 0.370 | 0.412 |
+| 1 | 11,960 | 1 | 0.033 | 0.743 | 0.216 | 0.016 | 0.052 |
+| 1 | 11,960 | 10 | 0.108 | 0.607 | 0.361 | 0.101 | 0.182 |
+| 1 | 11,960 | 100 | 0.476 | 1.080 | 0.665 | 0.328 | 0.384 |
+| 1 | 11,960 | 299 | 0.912 | 2.384 | 1.099 | 1.162 | 0.411 |
+| 1 | 11,960 | 599 | 2.297 | 4.755 | 1.738 | 8.255 | 0.412 |
+| 1 | 59,800 | 1 | 0.011 | 0.444 | 0.046 | 0.003 | 0.052 |
+| 1 | 59,800 | 10 | 0.036 | 0.319 | 0.077 | 0.031 | 0.182 |
+| 1 | 59,800 | 100 | 0.192 | 0.524 | 0.298 | 0.287 | 0.384 |
+| 1 | 59,800 | 299 | 0.355 | 0.818 | 0.506 | 0.655 | 0.411 |
+| 1 | 59,800 | 599 | 0.491 | 1.033 | 0.652 | 1.042 | 0.412 |
+| 1 | 119,600 | 1 | 0.009 | 0.322 | 0.041 | 0.003 | 0.052 |
+| 1 | 119,600 | 10 | 0.025 | 0.280 | 0.069 | 0.019 | 0.182 |
+| 1 | 119,600 | 100 | 0.110 | 0.334 | 0.179 | 0.127 | 0.384 |
+| 1 | 119,600 | 299 | 0.193 | 0.421 | 0.294 | 0.208 | 0.411 |
+| 1 | 119,600 | 599 | 0.262 | 0.461 | 0.359 | 0.291 | 0.412 |

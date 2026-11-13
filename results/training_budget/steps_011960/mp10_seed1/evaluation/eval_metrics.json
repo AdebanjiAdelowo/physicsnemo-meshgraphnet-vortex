@@ -1,0 +1,569 @@
+{
+  "run": "mp10_seed1",
+  "processor_size": 10,
+  "test_trajectories": 50,
+  "rollout_steps": 599,
+  "training_window_steps": 299,
+  "one_step_stride": 5,
+  "one_step": {
+    "window": {
+      "rel_l2_velocity": 0.011561791603247887,
+      "rel_l2_velocity_increment": 0.5807745376619924,
+      "rel_l2_pressure": 0.6103224733232026,
+      "rmse_velocity": 0.009277363185634147,
+      "rmse_pressure": 0.10629652134535048
+    },
+    "all": {
+      "rel_l2_velocity": 0.011535728203138798,
+      "rel_l2_velocity_increment": 0.535290551468548,
+      "rel_l2_pressure": 0.5995894657781851,
+      "rmse_velocity": 0.009017776158579847,
+      "rmse_pressure": 0.10288002717812195
+    }
+  },
+  "rollout_horizons": {
+    "1": {
+      "rel_l2_velocity": {
+        "mean": 0.03310423062889266,
+        "median": 0.032491529536323685,
+        "max": 0.04027014133071421,
+        "n_finite": 50
+      },
+      "rel_l2_pressure": {
+        "mean": 0.7425113051157082,
+        "median": 0.7229303849499282,
+        "max": 0.9792015745274131,
+        "n_finite": 50
+      },
+      "rel_l2_vorticity": {
+        "mean": 0.21641200702805988,
+        "median": 0.2147894911752356,
+        "max": 0.23376521233590314,
+        "n_finite": 50
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.03310423062889266,
+        "median": 0.032491529536323685,
+        "max": 0.04027014133071421,
+        "n_finite": 50
+      },
+      "rmse_velocity": {
+        "mean": 0.051289658735615216,
+        "median": 0.05027047595495725,
+        "max": 0.09718691442628945,
+        "n_finite": 50
+      },
+      "rmse_pressure": {
+        "mean": 0.42945632250766713,
+        "median": 0.4080715603379146,
+        "max": 0.9342182294415116,
+        "n_finite": 50
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.05222179239493992,
+        "median": 0.05251173893715769,
+        "max": 0.05858690843886878,
+        "n_finite": 50
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 0.016299741786967803,
+        "median": 0.01483862458065053,
+        "max": 0.03176029884214269,
+        "n_finite": 50
+      }
+    },
+    "10": {
+      "rel_l2_velocity": {
+        "mean": 0.10759463815739599,
+        "median": 0.10155500802354639,
+        "max": 0.17585423108990286,
+        "n_finite": 50
+      },
+      "rel_l2_pressure": {
+        "mean": 0.6068131968578802,
+        "median": 0.5882822834672203,
+        "max": 1.0611311816957338,
+        "n_finite": 50
+      },
+      "rel_l2_vorticity": {
+        "mean": 0.3610240697653444,
+        "median": 0.36112625781622476,
+        "max": 0.41715546587541186,
+        "n_finite": 50
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.0951414832409811,
+        "median": 0.09054128914579823,
+        "max": 0.1744316105441237,
+        "n_finite": 50
+      },
+      "rmse_velocity": {
+        "mean": 0.10795678047096433,
+        "median": 0.0977467429590144,
+        "max": 0.23153376477075727,
+        "n_finite": 50
+      },
+      "rmse_pressure": {
+        "mean": 0.13500266054734514,
+        "median": 0.09785589993189431,
+        "max": 0.430366332660236,
+        "n_finite": 50
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.18173194937123488,
+        "median": 0.18200379495270397,
+        "max": 0.22079782705861023,
+        "n_finite": 50
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 0.10054822644259571,
+        "median": 0.08529056944850096,
+        "max": 0.25296597471402177,
+        "n_finite": 50
+      }
+    },
+    "50": {
+      "rel_l2_velocity": {
+        "mean": 0.2996393386111326,
+        "median": 0.2723365745340025,
+        "max": 0.5427409390169007,
+        "n_finite": 50
+      },
+      "rel_l2_pressure": {
+        "mean": 0.8238920731673811,
+        "median": 0.7777481205604615,
+        "max": 1.7818393182274217,
+        "n_finite": 50
+      },
+      "rel_l2_vorticity": {
+        "mean": 0.48306764088915743,
+        "median": 0.4566866400201477,
+        "max": 0.6720935628905189,
+        "n_finite": 50
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.2797336278597877,
+        "median": 0.24855853644550313,
+        "max": 0.5391742142560866,
+        "n_finite": 50
+      },
+      "rmse_velocity": {
+        "mean": 0.21898892628364655,
+        "median": 0.2100678407992474,
+        "max": 0.43051057089939265,
+        "n_finite": 50
+      },
+      "rmse_pressure": {
+        "mean": 0.15654014981470202,
+        "median": 0.10798859104105894,
+        "max": 0.556958670558612,
+        "n_finite": 50
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.32875294743556865,
+        "median": 0.3324803687942633,
+        "max": 0.4140466604302161,
+        "n_finite": 50
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 0.28020934802754616,
+        "median": 0.20408134254776145,
+        "max": 0.7278097740715127,
+        "n_finite": 50
+      }
+    },
+    "100": {
+      "rel_l2_velocity": {
+        "mean": 0.47583245711170524,
+        "median": 0.43619703415442085,
+        "max": 0.8407058152201015,
+        "n_finite": 50
+      },
+      "rel_l2_pressure": {
+        "mean": 1.0801328094387939,
+        "median": 0.9102133714837686,
+        "max": 2.7717158141704537,
+        "n_finite": 50
+      },
+      "rel_l2_vorticity": {
+        "mean": 0.664557299217353,
+        "median": 0.6274743882359917,
+        "max": 0.9886485306605421,
+        "n_finite": 50
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.4587003668273597,
+        "median": 0.4258475251832755,
+        "max": 0.8102116738664874,
+        "n_finite": 50
+      },
+      "rmse_velocity": {
+        "mean": 0.34080310263534186,
+        "median": 0.3436625993111302,
+        "max": 0.5335009390001497,
+        "n_finite": 50
+      },
+      "rmse_pressure": {
+        "mean": 0.184924124212094,
+        "median": 0.17365266857806955,
+        "max": 0.5555108615422278,
+        "n_finite": 50
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.383926653710429,
+        "median": 0.38484792261558326,
+        "max": 0.48977776109327426,
+        "n_finite": 50
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 0.3276711460973211,
+        "median": 0.21680102669217227,
+        "max": 0.8628400630379216,
+        "n_finite": 50
+      }
+    },
+    "200": {
+      "rel_l2_velocity": {
+        "mean": 0.6792590229687747,
+        "median": 0.6832177270968336,
+        "max": 1.3478105031308913,
+        "n_finite": 50
+      },
+      "rel_l2_pressure": {
+        "mean": 1.6318888983506872,
+        "median": 1.4347075923551462,
+        "max": 4.555245233836841,
+        "n_finite": 50
+      },
+      "rel_l2_vorticity": {
+        "mean": 0.8787105155044315,
+        "median": 0.8594708111706402,
+        "max": 1.2254932050528746,
+        "n_finite": 50
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.6748709222298533,
+        "median": 0.6759963601458405,
+        "max": 1.340896542493618,
+        "n_finite": 50
+      },
+      "rmse_velocity": {
+        "mean": 0.5077184397760633,
+        "median": 0.5441116112057848,
+        "max": 0.745830815749772,
+        "n_finite": 50
+      },
+      "rmse_pressure": {
+        "mean": 0.29132184778517756,
+        "median": 0.2953961821358721,
+        "max": 0.755380730049858,
+        "n_finite": 50
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.4089908944146026,
+        "median": 0.40524521161534777,
+        "max": 0.5090826010287749,
+        "n_finite": 50
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 0.48984148456625737,
+        "median": 0.2936747774301748,
+        "max": 1.9395531917461448,
+        "n_finite": 50
+      }
+    },
+    "299": {
+      "rel_l2_velocity": {
+        "mean": 0.9117445370899893,
+        "median": 0.8210055282374711,
+        "max": 2.3976104076912828,
+        "n_finite": 50
+      },
+      "rel_l2_pressure": {
+        "mean": 2.3844608592662038,
+        "median": 2.019488964844933,
+        "max": 6.129796775765911,
+        "n_finite": 50
+      },
+      "rel_l2_vorticity": {
+        "mean": 1.0987427650491934,
+        "median": 1.0686138819500517,
+        "max": 1.849377473456018,
+        "n_finite": 50
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.908859228535516,
+        "median": 0.8187596625231985,
+        "max": 2.3901289436806983,
+        "n_finite": 50
+      },
+      "rmse_velocity": {
+        "mean": 0.6880814861848314,
+        "median": 0.7327928055320512,
+        "max": 1.1850452401482585,
+        "n_finite": 50
+      },
+      "rmse_pressure": {
+        "mean": 0.423664513744488,
+        "median": 0.44597309817041764,
+        "max": 1.1381830391100975,
+        "n_finite": 50
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.41060238198697013,
+        "median": 0.40529667677822445,
+        "max": 0.5081329457035846,
+        "n_finite": 50
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 1.1617488622099497,
+        "median": 0.8011362434385323,
+        "max": 7.275876581309654,
+        "n_finite": 50
+      }
+    },
+    "450": {
+      "rel_l2_velocity": {
+        "mean": 1.5066887482224478,
+        "median": 1.2292732916567566,
+        "max": 4.374571939059148,
+        "n_finite": 50
+      },
+      "rel_l2_pressure": {
+        "mean": 3.477155998433491,
+        "median": 2.5798962181737153,
+        "max": 9.699082665121878,
+        "n_finite": 50
+      },
+      "rel_l2_vorticity": {
+        "mean": 1.4054540922637755,
+        "median": 1.3273141203337842,
+        "max": 2.6018441911060104,
+        "n_finite": 50
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 1.5038035326880685,
+        "median": 1.2287993360123473,
+        "max": 4.370996220607698,
+        "n_finite": 50
+      },
+      "rmse_velocity": {
+        "mean": 1.102822936057587,
+        "median": 1.1879193276755222,
+        "max": 2.1367049915946135,
+        "n_finite": 50
+      },
+      "rmse_pressure": {
+        "mean": 0.6044623838737047,
+        "median": 0.6989607229192407,
+        "max": 1.4270978272528247,
+        "n_finite": 50
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.4112597430506998,
+        "median": 0.40604022342817553,
+        "max": 0.5100453136040229,
+        "n_finite": 50
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 3.6887217115234727,
+        "median": 1.9664628956186205,
+        "max": 22.610581459909227,
+        "n_finite": 50
+      }
+    },
+    "599": {
+      "rel_l2_velocity": {
+        "mean": 2.2974678659099954,
+        "median": 2.230544074507347,
+        "max": 6.525948029124958,
+        "n_finite": 50
+      },
+      "rel_l2_pressure": {
+        "mean": 4.754871463538433,
+        "median": 3.419604935806256,
+        "max": 12.915737201949156,
+        "n_finite": 50
+      },
+      "rel_l2_vorticity": {
+        "mean": 1.7381523117425801,
+        "median": 1.754669933459612,
+        "max": 3.4298905458728446,
+        "n_finite": 50
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 2.295616443166265,
+        "median": 2.2278638016636227,
+        "max": 6.524783012711986,
+        "n_finite": 50
+      },
+      "rmse_velocity": {
+        "mean": 1.6512642692388355,
+        "median": 1.9451564775158725,
+        "max": 3.0758826872305858,
+        "n_finite": 50
+      },
+      "rmse_pressure": {
+        "mean": 0.758993987539303,
+        "median": 0.9183296612566474,
+        "max": 1.5749411429755495,
+        "n_finite": 50
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.4115329500957627,
+        "median": 0.40618947069935296,
+        "max": 0.5097724249436681,
+        "n_finite": 50
+      },
+      "kinetic_energy_rel_error": {
+        "mean": 8.25513178992661,
+        "median": 5.856792186737584,
+        "max": 46.980044442404164,
+        "n_finite": 50
+      }
+    }
+  },
+  "rollout_time_mean": {
+    "window": {
+      "rel_l2_velocity": {
+        "mean": 0.5527170590161421,
+        "median": 0.5322185664591643,
+        "max": 1.1300598520698586,
+        "n_finite": 50
+      },
+      "rel_l2_pressure": {
+        "mean": 1.4108912885171574,
+        "median": 1.184809531362557,
+        "max": 3.2105654915442505,
+        "n_finite": 50
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 0.5426068163672763,
+        "median": 0.523828602743585,
+        "max": 1.1198401830180147,
+        "n_finite": 50
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.3716408133655154,
+        "median": 0.37115841758240997,
+        "max": 0.45929408040728237,
+        "n_finite": 50
+      }
+    },
+    "all": {
+      "rel_l2_velocity": {
+        "mean": 1.0455517136612078,
+        "median": 0.8804771926090609,
+        "max": 2.7695464435948605,
+        "n_finite": 50
+      },
+      "rel_l2_pressure": {
+        "mean": 2.4803118338178622,
+        "median": 1.972332652872134,
+        "max": 6.409081805082106,
+        "n_finite": 50
+      },
+      "lagmin_rel_l2_velocity": {
+        "mean": 1.0391401171883243,
+        "median": 0.8743414865246546,
+        "max": 2.7631519138596463,
+        "n_finite": 50
+      },
+      "persistence_rel_l2_velocity": {
+        "mean": 0.3914756858521267,
+        "median": 0.38786297418347737,
+        "max": 0.48419368483852593,
+        "n_finite": 50
+      }
+    }
+  },
+  "trajectories_with_nonfinite_error": 0,
+  "trajectories_with_velocity_error_above_1": 36,
+  "first_step_with_velocity_error_above_1": [
+    416,
+    398,
+    340,
+    null,
+    430,
+    221,
+    465,
+    null,
+    null,
+    218,
+    405,
+    250,
+    441,
+    465,
+    281,
+    null,
+    378,
+    334,
+    184,
+    116,
+    329,
+    null,
+    286,
+    null,
+    null,
+    368,
+    373,
+    null,
+    240,
+    null,
+    334,
+    327,
+    305,
+    359,
+    null,
+    379,
+    null,
+    391,
+    425,
+    null,
+    null,
+    285,
+    323,
+    404,
+    371,
+    430,
+    null,
+    417,
+    367,
+    356
+  ],
+  "rollout_ms_per_step": 16.142172430985152,
+  "evaluation_device": "cuda:0",
+  "shedding_reference_count": 36,
+  "shedding_preserved_counts": {
+    "late_train": 0.0,
+    "extrapolation": 0.0
+  },
+  "checkpoint_sha256": "506d5d3f7960947cec8b16aa8931bc28771937772a8916ff2b879f114c0bef56",
+  "evaluation_seconds": 740.9734110220006,
+  "peak_evaluation_memory_mb": 87.97265625,
+  "environment": {
+    "timestamp_utc": "2026-11-13T13:47:54+00:00",
+    "git_commit": "25cbdf0604e55f21729e7719fe8dd009f217bce7",
+    "git_dirty": false,
+    "device": "cuda:0",
+    "gpu_name": "Tesla T4",
+    "gpu_memory_gb": 14.56,
+    "cuda_version": "13.2",
+    "python_version": "3.13.16",
+    "torch_version": "2.15.0+cu132",
+    "physicsnemo": {
+      "version": "2.3.0a0",
+      "commit": "b45a5c810c741e6b41f8515be24c51121f8fc21f",
+      "url": "https://github.com/NVIDIA/physicsnemo.git",
+      "example": "examples/cfd/vortex_shedding_mgn"
+    },
+    "torch_geometric_version": "2.8.1",
+    "torch_scatter_version": "2.1.2",
+    "tfrecord_version": "1.14.7",
+    "numpy_version": "2.5.4",
+    "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "torch_threads": 2,
+    "notebook_version": "adebanjiadelowo/mgn-vortex-budget-t4-followup/1"
+  }
+}

@@ -20,12 +20,12 @@ The comparison uses 50 test trajectories, 599-step rollouts, a velocity persiste
 baseline and the established frequency and amplitude criteria for vortex shedding.
 The [Kaggle notebook](kaggle/training_budget.ipynb) measures single-T4 throughput and
 runs the matched comparison. On one Tesla T4, the $K=10$ probe measured 26.71
-gradient steps per second. For seed 0, extending training from 11,960 to 119,600
-updates reduced mean relative velocity error over rollout steps 300–599 from
-1.712 to 0.366. In that window, 19 of 36 reference shedding trajectories met
-the frequency and amplitude criteria at the extended cutoff, compared with
-0 of 36 at the baseline. The extended model's mean step-599 velocity error
-was 0.449, compared with 0.412 for persistence.
+gradient steps per second. Across seeds 0 and 1, both larger budgets lowered
+mean relative velocity error over steps 300–599 and preserved shedding in
+some reference shedding trajectories. The 59,800-step checkpoint had the
+lowest late-rollout velocity error for seed 0, and the 119,600-step checkpoint
+had the lowest for seed 1. At 119,600 steps, 19 of 36 reference shedding cases
+met the preservation criteria for seed 0 and 3 of 36 did so for seed 1.
 
 ## Physical problem
 

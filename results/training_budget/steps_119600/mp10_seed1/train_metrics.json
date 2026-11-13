@@ -1,0 +1,15 @@
+{
+  "run": "mp10_seed1",
+  "processor_size": 10,
+  "seed": 1,
+  "parameters": 1588739,
+  "steps": 119600,
+  "final_train_loss": 0.05050917851885027,
+  "final_valid_loss": 0.04287551956431922,
+  "train_seconds": 4870.317544718,
+  "optimisation_seconds": 4804.326983369997,
+  "steps_per_second": 24.894225645754556,
+  "data_seconds": 17.09570079199989,
+  "peak_train_memory_mb": 468.548828125,
+  "device": "cuda:0"
+}

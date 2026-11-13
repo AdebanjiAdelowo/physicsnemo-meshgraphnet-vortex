@@ -1,0 +1,10 @@
+{
+  "stage": "followup",
+  "seed": 1,
+  "estimated_hours": 2.100721643867008,
+  "available_hours": 2.5648187402884166,
+  "train_exit_code": 0,
+  "evaluate_119600_exit_code": 0,
+  "evaluate_11960_exit_code": 0,
+  "evaluate_59800_exit_code": 0
+}
